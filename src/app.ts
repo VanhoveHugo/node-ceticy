@@ -2,14 +2,10 @@ import express, { Express, Request, Response, NextFunction } from "express";
 import helmet from "helmet";
 import cors from "cors";
 import compression from "compression";
-import dotenv from "dotenv";
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import { router } from "./routes/apiRouter";
 import { config } from "./config";
-
-// Load environment variables from a .env file (if present)
-dotenv.config();
 
 // Create an instance of the Express application
 const app: Express = express();
