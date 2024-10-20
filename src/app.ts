@@ -1,5 +1,5 @@
-import express, { Express, Request, Response, NextFunction } from "express";
-import router from "./routes/apiRouter";
+import express, { Express, Request, Response } from "express";
+import { router } from "./routes/apiRouter";
 import helmet from "helmet";
 import cors from "cors";
 import compression from "compression";
@@ -12,8 +12,8 @@ dotenv.config();
 const app: Express = express();
 
 // Middleware for parsing incoming requests
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(express.urlencoded({ extended: true }) as express.RequestHandler);
+app.use(express.json() as express.RequestHandler);
 
 // Security and configuration middlewares
 app.use(
@@ -21,18 +21,18 @@ app.use(
     contentSecurityPolicy:
       process.env.NODE_ENV === "production" ? undefined : false,
     crossOriginEmbedderPolicy: false,
-  })
+  }) as express.RequestHandler
 );
-app.use(cors());
-app.use(compression());
+app.use(cors() as express.RequestHandler);
+app.use(compression() as express.RequestHandler);
 
 // API routing middleware
 app.use("/", router);
 
-// Basic error handling middleware
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+// Error-handling middleware without the unused next parameter
+app.use((err: Error, req: Request, res: Response) => {
   console.error(err.stack);
   res.status(500).json({ message: "Internal Server Error" });
 });
 
-export default app;
+export { app };

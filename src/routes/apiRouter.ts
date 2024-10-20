@@ -16,4 +16,4 @@ router.get("/e", (req, res, next) => {
   }
 });
 
-export default router;
+export { router };
