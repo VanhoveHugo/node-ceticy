@@ -1,0 +1,148 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                Int          @id @default(autoincrement())
+  email             String       @unique
+  password          String
+  name              String?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  favorites         Favorite[]
+  friends1          Friend[]     @relation("UserFriends1")
+  friends2          Friend[]     @relation("UserFriends2")
+  pollsCreated      Poll[]       @relation("PollCreator")
+  Restaurant        Restaurant[]
+  swipes            Swipe[]
+  pollsParticipated Poll[]       @relation("PollParticipants")
+
+  @@map("users")
+}
+
+model Restaurant {
+  id             Int        @id @default(autoincrement())
+  name           String
+  description    String?
+  averagePrice   Float?
+  averageService Int?
+  phoneNumber    String?
+  plan           Plan
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  ownerId        Int
+  Favorite       Favorite[]
+  menu           Menu[]
+  photos         Photo[]
+  owner          User       @relation(fields: [ownerId], references: [id])
+  Swipe          Swipe[]
+  tags           Tag[]      @relation("RestaurantTags")
+
+  @@index([ownerId], map: "restaurants_ownerId_fkey")
+  @@map("restaurants")
+}
+
+model Photo {
+  id           Int        @id @default(autoincrement())
+  url          String
+  restaurantId Int
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+
+  @@index([restaurantId], map: "photos_restaurantId_fkey")
+  @@map("photos")
+}
+
+model Tag {
+  id          Int          @id @default(autoincrement())
+  name        String
+  restaurants Restaurant[] @relation("RestaurantTags")
+
+  @@map("tags")
+}
+
+model Menu {
+  id           Int        @id @default(autoincrement())
+  item         String
+  price        Float
+  restaurantId Int
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+
+  @@index([restaurantId], map: "menus_restaurantId_fkey")
+  @@map("menus")
+}
+
+model Favorite {
+  id           Int        @id @default(autoincrement())
+  userId       Int
+  restaurantId Int
+  createdAt    DateTime   @default(now())
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  user         User       @relation(fields: [userId], references: [id])
+
+  @@index([restaurantId], map: "favorites_restaurantId_fkey")
+  @@index([userId], map: "favorites_userId_fkey")
+  @@map("favorites")
+}
+
+model Swipe {
+  id           Int        @id @default(autoincrement())
+  userId       Int
+  restaurantId Int
+  liked        Boolean
+  timestamp    DateTime   @default(now())
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  user         User       @relation(fields: [userId], references: [id])
+
+  @@index([restaurantId], map: "swipes_restaurantId_fkey")
+  @@index([userId], map: "swipes_userId_fkey")
+  @@map("swipes")
+}
+
+model Poll {
+  id           Int          @id @default(autoincrement())
+  name         String
+  creatorId    Int
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  options      PollOption[]
+  creator      User         @relation("PollCreator", fields: [creatorId], references: [id])
+  participants User[]       @relation("PollParticipants")
+
+  @@index([creatorId], map: "polls_creatorId_fkey")
+  @@map("polls")
+}
+
+model PollOption {
+  id        Int    @id @default(autoincrement())
+  pollId    Int
+  name      String
+  voteCount Int    @default(0)
+  poll      Poll   @relation(fields: [pollId], references: [id])
+
+  @@index([pollId], map: "poll_options_pollId_fkey")
+  @@map("poll_options")
+}
+
+model Friend {
+  id        Int      @id @default(autoincrement())
+  user1Id   Int
+  user2Id   Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user1     User     @relation("UserFriends1", fields: [user1Id], references: [id])
+  user2     User     @relation("UserFriends2", fields: [user2Id], references: [id])
+  status    String   @default("pending") // valeurs possibles: 'pending', 'accept', 'reject'
+
+  @@map("friends")
+}
+
+enum Plan {
+  FREE
+  PAID1
+  PAID2
+}
