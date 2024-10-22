@@ -131,3 +131,5 @@ dist
 
 # Add Mac-specific files
 .DS_Store
+
+migration.sql

@@ -8,3 +8,7 @@ export interface AuthLoginBody {
   email: string;
   password: string;
 }
+
+export interface FriendCreateBody {
+  friendId: number;
+}

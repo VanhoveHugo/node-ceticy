@@ -10,7 +10,7 @@ import {
   validateName,
 } from "../utils/validateData";
 import { config } from "../config";
-import { AuthLoginBody, AuthRegisterBody } from "@/utils/interfacesRequest";
+import { AuthLoginBody, AuthRegisterBody } from "../utils/interfacesRequest";
 
 
 
@@ -40,9 +40,8 @@ export const authRegister = async (
 
     // Hash the password
     const hash = hashSync(password, 10);
-    if (!hash) {
-      throw new Error("HashError");
-    }
+
+    if (!hash) throw new Error("HashError");
 
     // Create the new user in the database
     const user = await prisma.user.create({
@@ -54,9 +53,7 @@ export const authRegister = async (
     });
 
     // Check if the user was created
-    if (!user) {
-      throw new Error("UserCreationError");
-    }
+    if (!user) throw new Error("UserCreationError");
 
     res.status(201).json(user);
   } catch (error: string | unknown) {

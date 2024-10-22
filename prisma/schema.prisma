@@ -138,6 +138,8 @@ model Friend {
   user2     User     @relation("UserFriends2", fields: [user2Id], references: [id])
   status    String   @default("pending") // valeurs possibles: 'pending', 'accept', 'reject'
 
+  @@unique([user1Id, user2Id])
+
   @@map("friends")
 }
 

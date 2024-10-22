@@ -17,3 +17,7 @@ export const validatePassword = (password: string): boolean => {
 export const validateName = (name: string): boolean => {
   return name.length <= 191;
 }
+
+export const validateNumber = (number: string): boolean => {
+  return !isNaN(Number(number));
+}

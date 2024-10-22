@@ -9,7 +9,6 @@ const customerRouter: Router = Router();
  *   post:
  *     tags: [Auth]
  *     summary: Register a new user
- *     description: Add a new user to the database
  *     requestBody:
  *       required: true
  *       content:
@@ -33,6 +32,8 @@ const customerRouter: Router = Router();
  *         description: "{ user }"
  *       400:
  *         description: "{ kind: error_code, content: invalid_field  }"
+ *       500:
+ *         description: "{ kind: 'server_error', content: reason }"
  */
 customerRouter.post("/signup", authRegister);
 
@@ -42,7 +43,6 @@ customerRouter.post("/signup", authRegister);
  *   post:
  *     tags: [Auth]
  *     summary: Login a existing user
- *     description: Login a user and return a token
  *     requestBody:
  *       required: true
  *       content:
@@ -63,6 +63,8 @@ customerRouter.post("/signup", authRegister);
  *         description: "{ token }"
  *       400:
  *         description: "{ kind: error_code, content: invalid_field  }"
+ *       500:
+ *         description: "{ kind: 'server_error', content: reason }"
  */
 customerRouter.post("/signin", authLogin);
 

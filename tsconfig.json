@@ -9,11 +9,8 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "typeRoots": ["./node_modules/@types", "./@types"],
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["src/*"]
-    }
+    "baseUrl": "."
   },
-  "include": ["src/**/*.ts", "@types/declarations.d.ts"],
+  "include": ["src/**/*.ts", "@types/*.d.ts"],
   "exclude": ["node_modules", "dist"]
 }
