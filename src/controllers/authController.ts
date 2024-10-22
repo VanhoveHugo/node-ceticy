@@ -15,10 +15,10 @@ import { AuthLoginBody, AuthRegisterBody } from "@/utils/interfacesRequest";
 
 
 export const authRegister = async (
-  req: Request<{}, {}, AuthRegisterBody>,
+  req: Request<object, object, AuthRegisterBody>,
   res: Response
 ) => {
-  const { email, password, name } = req.body;
+  const { email, password, name }: AuthRegisterBody = req.body;
 
   try {
     // Check if all required fields are present and valid
@@ -77,10 +77,10 @@ export const authRegister = async (
 };
 
 export const authLogin = async (
-  req: Request<{}, {}, AuthLoginBody>,
+  req: Request<object, object, AuthLoginBody>,
   res: Response
 ) => {
-  const { email, password } = req.body;
+  const { email, password }: AuthLoginBody = req.body;
 
   try {
     // Check if all required fields are present and valid
@@ -107,7 +107,7 @@ export const authLogin = async (
     }
 
     // Create a JWT token
-    const token = jwt.sign({ id: existingUser.id }, config.JWT_SECRET);
+    const token: string = jwt.sign({ id: existingUser.id }, config.JWT_SECRET);
 
     // Check if the token was created
     if (!token) {
