@@ -1,12 +1,12 @@
 import { Response } from "express";
 
 const validateField = (
-  fieldValue: any,
+  fieldValue: unknown,
   validatorFn: (value: any) => boolean,
   fieldName: string,
   res: Response,
-  missingMessage: string = "content_missing",
-  invalidMessage: string = "content_invalid"
+  missingMessage = "content_missing",
+  invalidMessage = "content_invalid"
 ) => {
   if (!fieldValue) {
     res.status(400).json({ kind: missingMessage, content: fieldName });

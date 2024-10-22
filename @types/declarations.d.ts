@@ -11,3 +11,4 @@ declare const helmet: () => void;
 declare const swaggerJsDoc: () => void;
 declare const compression: () => void;
 declare const swaggerUi: { serve: void; setup: () => void };
+declare const jwt: { sign: () => void };

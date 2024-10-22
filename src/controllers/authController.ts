@@ -10,8 +10,14 @@ import {
   validateName,
 } from "../utils/validateData";
 import { config } from "../config";
+import { AuthLoginBody, AuthRegisterBody } from "@/utils/interfacesRequest";
 
-export const authRegister = async (req: Request, res: Response) => {
+
+
+export const authRegister = async (
+  req: Request<{}, {}, AuthRegisterBody>,
+  res: Response
+) => {
   const { email, password, name } = req.body;
 
   try {
@@ -53,22 +59,27 @@ export const authRegister = async (req: Request, res: Response) => {
     }
 
     res.status(201).json(user);
-  } catch (error: string | any) {
+  } catch (error: string | unknown) {
     console.error("Error during user registration:", error);
 
-    if (error.message === "HashError") {
-      return res.status(500).json(ERROR_MESSAGES.serverError("hash"));
-    }
+    if (error instanceof Error) {
+      if (error.message === "HashError") {
+        return res.status(500).json(ERROR_MESSAGES.serverError("hash"));
+      }
 
-    if (error.message === "UserCreationError") {
-      return res.status(500).json(ERROR_MESSAGES.serverError("user"));
+      if (error.message === "UserCreationError") {
+        return res.status(500).json(ERROR_MESSAGES.serverError("user"));
+      }
     }
 
     res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
   }
 };
 
-export const authLogin = async (req: Request, res: Response) => {
+export const authLogin = async (
+  req: Request<{}, {}, AuthLoginBody>,
+  res: Response
+) => {
   const { email, password } = req.body;
 
   try {
@@ -83,7 +94,10 @@ export const authLogin = async (req: Request, res: Response) => {
     // Check if the email is already in use
     const existingUser = await prisma.user.findFirst({ where: { email } });
 
-    if (!existingUser || !existingUser.password || !compareSync(password, existingUser.password)) {
+    if (
+      !existingUser?.password ||
+      !compareSync(password, existingUser.password)
+    ) {
       return res.status(401).json(ERROR_MESSAGES.invalidCredentials("form"));
     }
 
@@ -101,15 +115,17 @@ export const authLogin = async (req: Request, res: Response) => {
     }
 
     res.status(200).json({ token });
-  } catch (error: string | any) {
+  } catch (error: string | unknown) {
     console.error("Error during user registration:", error);
 
-    if (error.message === "HashError") {
-      return res.status(500).json(ERROR_MESSAGES.serverError("hash"));
-    }
+    if (error instanceof Error) {
+      if (error.message === "Missing JWT") {
+        return res.status(500).json(ERROR_MESSAGES.serverError("jwt"));
+      }
 
-    if (error.message === "UserCreationError") {
-      return res.status(500).json(ERROR_MESSAGES.serverError("user"));
+      if (error.message === "TokenError") {
+        return res.status(500).json(ERROR_MESSAGES.serverError("token"));
+      }
     }
 
     res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
