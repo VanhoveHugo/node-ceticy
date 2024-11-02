@@ -5,7 +5,7 @@ import {
   getFriendRequests,
   getFriends,
   updateFriendRequest,
-} from "../controllers/friendsController";
+} from "../controllers/friendController";
 import { authMiddleware } from "../middleware/authMiddleware";
 
 const friendsRouter = Router();
@@ -16,7 +16,7 @@ friendsRouter.use(authMiddleware);
  * @swagger
  * /friends/:
  *   get:
- *     tags: [Friends]
+ *     tags: [Todo]
  *     summary: Get all friends of the user
  *     security:
  *       - bearerAuth: []
@@ -34,7 +34,7 @@ friendsRouter.get("/", getFriends);
  * @swagger
  * /friends/requests/:
  *   get:
- *     tags: [Friends]
+ *     tags: [Todo]
  *     summary: Get friends requests of the user
  *     security:
  *       - bearerAuth: []
@@ -81,7 +81,7 @@ friendsRouter.post("/", addFriendRequest);
  * @swagger
  * /friends/:
  *   put:
- *     tags: [Friends]
+ *     tags: [Todo]
  *     summary: Update a friend request (accept or refuse)
  *     security:
  *       - bearerAuth: []
@@ -114,7 +114,7 @@ friendsRouter.put("/", updateFriendRequest);
  * @swagger
  * /friends/:
  *   delete:
- *     tags: [Friends]
+ *     tags: [Todo]
  *     summary: Delete a friend request
  *     security:
  *       - bearerAuth: []

@@ -1,6 +1,6 @@
 import { prisma } from "../prisma/client";
 
-export const friendsServiceCreate = async (userId1: number, userId2: number) => {
+export const friendServiceCreate = async (userId1: number, userId2: number) => {
   try {
     return prisma.friend.create({
       data: {
@@ -13,7 +13,7 @@ export const friendsServiceCreate = async (userId1: number, userId2: number) => 
   }
 };
 
-export const friendsServiceFindByIds = async (userId1: number, userId2: number) => {
+export const friendServiceFindByIds = async (userId1: number, userId2: number) => {
   try {
     return prisma.friend.findFirst({
       where: {

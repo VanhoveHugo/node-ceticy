@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { authRouter } from "./authRoutes";
-import { friendsRouter } from "./friendsRoutes";
+import { friendsRouter } from "./friendRoutes";
 
 const router: Router = Router();
 
@@ -19,5 +19,12 @@ router.use("/auth", authRouter);
  *     description: Manage friends
  */
 router.use("/friends", friendsRouter);
+
+/**
+ * @swagger
+ * tags:
+ *   - name: Todo
+ *     description: Features come soon
+ */
 
 export { router };

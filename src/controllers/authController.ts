@@ -12,58 +12,61 @@ import {
 import { config } from "../config";
 import { AuthLoginBody, AuthRegisterBody } from "../utils/interfacesRequest";
 
+// Create a user or manager
+async function createUserOrManager(schema: any, data: any) {
+  return await schema.create({ data });
+}
 
+// Find a user or manager by email
+async function findUserOrManager(schema: any, email: any) {
+  return await schema.findFirst({ where: { email } });
+}
 
 export const authRegister = async (
   req: Request<object, object, AuthRegisterBody>,
   res: Response
 ) => {
-  const { email, password, name }: AuthRegisterBody = req.body;
+  const { email, password, name, manager }: AuthRegisterBody = req.body;
 
   try {
     // Check if all required fields are present and valid
     if (
       !validateField(email, validateEmail, "email", res) ||
       !validateField(password, validatePassword, "password", res) ||
-      (name && !validateField(name, validateName, "name", res))
+      !validateField(name, validateName, "name", res)
     ) {
       return;
     }
 
-    // Check if the email is already in use
-    const userExists = await prisma.user.findFirst({ where: { email } });
+    // Check if the user is a manager
+    const schema = manager ? prisma.manager : prisma.user;
 
-    // Stop if the user already exists
+    // Check if the user already exists
+    const userExists = await findUserOrManager(schema, email);
     if (userExists) {
       return res.status(409).json(ERROR_MESSAGES.contentDuplicate("email"));
     }
 
     // Hash the password
     const hash = hashSync(password, 10);
-
     if (!hash) throw new Error("HashError");
 
-    // Create the new user in the database
-    const user = await prisma.user.create({
-      data: {
-        email,
-        password: hash,
-        name,
-      },
+    // Create the user or manager
+    const user = await createUserOrManager(schema, {
+      email,
+      password: hash,
+      name,
     });
-
-    // Check if the user was created
     if (!user) throw new Error("UserCreationError");
 
     res.status(201).json(user);
-  } catch (error: string | unknown) {
+  } catch (error: unknown) {
     console.error("Error during user registration:", error);
 
     if (error instanceof Error) {
       if (error.message === "HashError") {
         return res.status(500).json(ERROR_MESSAGES.serverError("hash"));
       }
-
       if (error.message === "UserCreationError") {
         return res.status(500).json(ERROR_MESSAGES.serverError("user"));
       }
@@ -77,7 +80,7 @@ export const authLogin = async (
   req: Request<object, object, AuthLoginBody>,
   res: Response
 ) => {
-  const { email, password }: AuthLoginBody = req.body;
+  const { email, password, manager }: AuthLoginBody = req.body;
 
   try {
     // Check if all required fields are present and valid
@@ -85,12 +88,14 @@ export const authLogin = async (
       !validateField(email, validateEmail, "email", res) ||
       !validateField(password, validatePassword, "password", res)
     ) {
-      return; // Stop execution if validation fails
+      return;
     }
 
-    // Check if the email is already in use
-    const existingUser = await prisma.user.findFirst({ where: { email } });
+    // Check if the user is a manager
+    const schema = manager ? prisma.manager : prisma.user;
 
+    // Find the user or manager
+    const existingUser = await findUserOrManager(schema, email);
     if (
       !existingUser?.password ||
       !compareSync(password, existingUser.password)
@@ -100,26 +105,21 @@ export const authLogin = async (
 
     // Check if the JWT secret is set
     if (!config.JWT_SECRET) {
-      throw new Error("Missing JWT");
+      throw new Error("MissingJWT");
     }
 
     // Create a JWT token
-    const token: string = jwt.sign({ id: existingUser.id }, config.JWT_SECRET);
-
-    // Check if the token was created
-    if (!token) {
-      throw new Error("TokenError");
-    }
+    const token = jwt.sign({ id: existingUser.id, scope: manager ? "manager" : "user" }, config.JWT_SECRET);
+    if (!token) throw new Error("TokenError");
 
     res.status(200).json({ token });
-  } catch (error: string | unknown) {
-    console.error("Error during user registration:", error);
+  } catch (error: unknown) {
+    console.error("Error during login:", error);
 
     if (error instanceof Error) {
-      if (error.message === "Missing JWT") {
+      if (error.message === "MissingJWT") {
         return res.status(500).json(ERROR_MESSAGES.serverError("jwt"));
       }
-
       if (error.message === "TokenError") {
         return res.status(500).json(ERROR_MESSAGES.serverError("token"));
       }

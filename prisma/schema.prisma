@@ -18,11 +18,23 @@ model User {
   friends1          Friend[]     @relation("UserFriends1")
   friends2          Friend[]     @relation("UserFriends2")
   pollsCreated      Poll[]       @relation("PollCreator")
-  Restaurant        Restaurant[]
   swipes            Swipe[]
   pollsParticipated Poll[]       @relation("PollParticipants")
 
   @@map("users")
+}
+
+model Manager {
+  id                Int          @id @default(autoincrement())
+  email             String       @unique
+  password          String
+  name              String?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  Restaurant        Restaurant[]
+  plan              Plan       @default(FREE) // valeurs possibles: 'FREE', 'PAID1', 'PAID2'
+
+  @@map("managers")
 }
 
 model Restaurant {
@@ -39,7 +51,7 @@ model Restaurant {
   Favorite       Favorite[]
   menu           Menu[]
   photos         Photo[]
-  owner          User       @relation(fields: [ownerId], references: [id])
+  owner          Manager    @relation(fields: [ownerId], references: [id])
   Swipe          Swipe[]
   tags           Tag[]      @relation("RestaurantTags")
 

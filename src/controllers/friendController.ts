@@ -2,11 +2,11 @@ import { Request, Response } from "express";
 import { validateField } from "../utils/validateField";
 import { ERROR_MESSAGES } from "../utils/errorMessages";
 import { validateNumber } from "../utils/validateData";
-import { usersServiceFindById } from "../services/usersService";
+import { customerServiceFindById } from "../services/customerService";
 import {
-  friendsServiceCreate,
-  friendsServiceFindByIds,
-} from "../services/friendsService";
+  friendServiceCreate,
+  friendServiceFindByIds,
+} from "../services/friendService";
 import { FriendCreateBody } from "../utils/interfacesRequest";
 
 export const getFriends = (req: Request, res: Response) => {
@@ -29,7 +29,7 @@ export const addFriendRequest = async (
       .json({ message: ERROR_MESSAGES.contentMissing("friendId") });
   }
   try {
-    const targetUser = await usersServiceFindById(friendId);
+    const targetUser = await customerServiceFindById(friendId);
 
     let targerId = Number(targetUser?.id);
 
@@ -43,7 +43,7 @@ export const addFriendRequest = async (
         .status(400)
         .json({ message: ERROR_MESSAGES.contentInvalid("id") });
 
-    const existingFriendRequest = await friendsServiceFindByIds(
+    const existingFriendRequest = await friendServiceFindByIds(
       req.userId,
       targerId
     );
@@ -53,17 +53,17 @@ export const addFriendRequest = async (
         .status(400)
         .json({ message: ERROR_MESSAGES.contentDuplicate("id") });
 
-    const existingFriendRequestReverse = await friendsServiceFindByIds(
+    const existingFriendRequestReverse = await friendServiceFindByIds(
       targerId,
       req.userId
-    ).catch((error) => null);
+    );
 
     if (existingFriendRequestReverse)
       return res
         .status(400)
         .json({ message: ERROR_MESSAGES.contentDuplicate("id") });
 
-    const friendRequest = await friendsServiceCreate(req.userId, targerId);
+    const friendRequest = await friendServiceCreate(req.userId, targerId);
 
     if (!friendRequest) throw new Error("Friend request not created");
 

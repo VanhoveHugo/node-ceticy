@@ -1,6 +1,6 @@
 import { prisma } from "../prisma/client";
 
-export const usersServiceCreate = async (email: string, password: string) => {
+export const customerServiceCreate = async (email: string, password: string) => {
   try {
     return prisma.user.create({
       data: {
@@ -13,7 +13,7 @@ export const usersServiceCreate = async (email: string, password: string) => {
   }
 };
 
-export const usersServiceFindById = async (id: number) => {
+export const customerServiceFindById = async (id: number) => {
   try {
     return prisma.user.findUnique({
     where: {
