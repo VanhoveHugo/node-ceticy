@@ -13,8 +13,8 @@ docker-compose up
 
 ## Features
 
-- [ ] User Authentication
+- [x] User Authentication
 - [ ] Friend Management
-- [ ] Restaurant Manager Authentication
+- [x] Manager Authentication
 - [ ] Restaurant Creation
 - [ ] Restaurant Swiping
