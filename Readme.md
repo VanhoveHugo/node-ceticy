@@ -15,6 +15,5 @@ docker-compose up
 
 - [x] User Authentication
 - [ ] Friend Management
-- [x] Manager Authentication
-- [ ] Restaurant Creation
-- [ ] Restaurant Swiping
+- [ ] Manager Authentication
+- [x] Restaurant Creation

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { authRouter } from "./authRoutes";
 import { friendsRouter } from "./friendRoutes";
+import { restaurantRouter } from "./restaurantRoutes";
 
 const router: Router = Router();
 
@@ -19,6 +20,14 @@ router.use("/auth", authRouter);
  *     description: Manage friends
  */
 router.use("/friends", friendsRouter);
+
+/**
+ * @swagger
+ * tags:
+ *   - name: Restaurants
+ *     description: Manage restaurants
+ */
+router.use("/restaurants", restaurantRouter);
 
 /**
  * @swagger

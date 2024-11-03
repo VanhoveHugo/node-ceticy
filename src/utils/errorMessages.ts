@@ -15,5 +15,9 @@ export const ERROR_MESSAGES = {
     kind: "invalid_credentials",
     content: field,
   }),
+  accessDenied: (field: string) => ({
+    kind: "access_denied",
+    content: field,
+  }),
   serverError: (field: string) => ({ kind: "server_error", content: field }),
 };
