@@ -15,3 +15,11 @@ export interface AuthLoginBody {
 export interface FriendCreateBody {
   friendId: number;
 }
+
+export interface RestaurantCreateBody {
+  name: string;
+  description: string;
+  averagePrive: number;
+  averageService: number;
+  phoneNumber: string;
+}

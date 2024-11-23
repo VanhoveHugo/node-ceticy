@@ -108,7 +108,7 @@ export const authLogin = async (
 
     // Create a JWT token
     const token = jwt.sign(
-      { id: user.id, scope: "manager" },
+      { id: user.id, scope: "user" },
       config.JWT_SECRET
     );
     if (!token) throw new Error("TokenError");

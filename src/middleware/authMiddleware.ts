@@ -1,8 +1,18 @@
 import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 import { config } from "../config";
+import { ERROR_MESSAGES } from "../utils/errorMessages";
 
+declare module "express-serve-static-core" {
+  interface Request {
+    user?: {
+      id: number;
+      manager: boolean;
+    };
+  }
+}
 interface JwtPayload {
+  scope: string;
   id: string;
 }
 
@@ -11,10 +21,10 @@ export const authMiddleware = (
   res: Response,
   next: NextFunction
 ) => {
-  const token = req.headers.authorization?.split(" ")[1]; // Récupérer le token Bearer
+  const token = req.headers.authorization?.split(" ")[1];
 
   if (!token) {
-    return res.status(401).json({ message: "No token, authorization denied" });
+    return res.status(401).json(ERROR_MESSAGES.accessDenied("unauthenticated"));
   }
 
   try {
@@ -22,22 +32,29 @@ export const authMiddleware = (
     const decoded = jwt.verify(token, config.JWT_SECRET) as JwtPayload;
 
     // Stock if the decoded JWT has an id
-    req.userId = parseInt(decoded.id);
+    req.user = {
+      id: parseInt(decoded.id),
+      manager: decoded.scope === "manager",
+    };
 
-    if (!req.userId) {
-      return res.status(401).json({ message: "Token is not valid" });
+    if (!req.user) {
+      return res.status(401).json(ERROR_MESSAGES.accessDenied("unauthorized"));
     }
 
     next();
   } catch (err) {
     console.error("Token is not valid");
-    return res.status(401).json({ message: "Token is not valid" });
+    return res.status(401).json(ERROR_MESSAGES.accessDenied("unauthorized"));
   }
 };
 
-// Extend the Request interface to include userId
-declare module "express-serve-static-core" {
-  interface Request {
-    userId?: number;
+export const managerMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  if (!req.user?.manager) {
+    return res.status(401).json(ERROR_MESSAGES.accessDenied("unauthorized"));
   }
+  next();
 }

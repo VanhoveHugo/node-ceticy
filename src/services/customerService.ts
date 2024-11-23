@@ -28,7 +28,11 @@ export const customerServiceFindByEmail = async (email: string) => {
 export const customerServiceFindById = async (id: number) => {
   if (!connection) return;
   try {
-    return await connection.query(`SELECT * FROM users WHERE id = ?`, [id]);
+    const res = await connection
+      .promise()
+      .query(`SELECT * FROM users WHERE id = ?`, [id]);
+
+    return res[0];
   } catch (error: string | unknown) {
     console.error("Error during user registration:", error);
   }

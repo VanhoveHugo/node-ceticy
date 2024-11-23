@@ -33,18 +33,18 @@ export const addFriendRequest = async (
 
     let targerId = Number(targetUser?.id);
 
-    if (!targetUser || !req.userId)
+    if (!targetUser || !req.user?.id)
       return res
         .status(404)
         .json({ message: ERROR_MESSAGES.invalidCredentials("form") });
 
-    if (targerId === req.userId)
+    if (targerId === req.user?.id)
       return res
         .status(400)
         .json({ message: ERROR_MESSAGES.contentInvalid("id") });
 
     const existingFriendRequest = await friendServiceFindByIds(
-      req.userId,
+      req.user?.id,
       targerId
     );
 
@@ -55,7 +55,7 @@ export const addFriendRequest = async (
 
     const existingFriendRequestReverse = await friendServiceFindByIds(
       targerId,
-      req.userId
+      req.user?.id
     );
 
     if (existingFriendRequestReverse)
@@ -63,7 +63,7 @@ export const addFriendRequest = async (
         .status(400)
         .json({ message: ERROR_MESSAGES.contentDuplicate("id") });
 
-    const friendRequest = await friendServiceCreate(req.userId, targerId);
+    const friendRequest = await friendServiceCreate(req.user?.id, targerId);
 
     if (!friendRequest) throw new Error("Friend request not created");
 
@@ -80,10 +80,3 @@ export const updateFriendRequest = (req: Request, res: Response) => {
 export const deleteFriendRequest = (req: Request, res: Response) => {
   return res.status(200).json({ message: "in progress" });
 };
-
-// Extend the Request interface to include userId
-declare module "express-serve-static-core" {
-  interface Request {
-    userId?: number;
-  }
-}
