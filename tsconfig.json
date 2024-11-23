@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
     "target": "ESNext",
     "module": "commonjs",
     "strict": true,
@@ -8,9 +10,9 @@
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist",
     "rootDir": "./src",
-    "typeRoots": ["./node_modules/@types", "./@types"],
+    "typeRoots": ["./node_modules/@types"],
     "baseUrl": "."
   },
-  "include": ["src/**/*.ts", "@types/*.d.ts"],
+  "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }

@@ -1,25 +1,34 @@
-import { prisma } from "../prisma/client";
+import { connection } from "../utils/database";
 
 export const customerServiceCreate = async (email: string, password: string) => {
+  if (!connection) return
   try {
-    return prisma.user.create({
-      data: {
-        email,
-        password,
-      },
-    });
+    const res: any = await connection
+      .promise()
+      .query("INSERT INTO users (email, password) VALUES (?, ?)", [email, password]);
+    return res.insertId;
   } catch (error: string | unknown) {
     console.error("Error during user registration:", error);
   }
 };
 
-export const customerServiceFindById = async (id: number) => {
+export const customerServiceFindByEmail = async (email: string) => {
+  if (!connection) return;
   try {
-    return prisma.user.findUnique({
-    where: {
-      id,
-    },
-    });
+    const res = await connection
+      .promise()
+      .query("SELECT id, email, password FROM users WHERE email = ? LIMIT 1", [email]);
+
+    return res[0];
+  } catch (error: string | unknown) {
+    console.error("Error during user registration:", error);
+  }
+}
+
+export const customerServiceFindById = async (id: number) => {
+  if (!connection) return;
+  try {
+    return await connection.query(`SELECT * FROM users WHERE id = ?`, [id]);
   } catch (error: string | unknown) {
     console.error("Error during user registration:", error);
   }

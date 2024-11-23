@@ -29,7 +29,7 @@ export const addFriendRequest = async (
       .json({ message: ERROR_MESSAGES.contentMissing("friendId") });
   }
   try {
-    const targetUser = await customerServiceFindById(friendId);
+    const targetUser: any = await customerServiceFindById(friendId);
 
     let targerId = Number(targetUser?.id);
 
