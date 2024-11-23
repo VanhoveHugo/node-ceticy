@@ -7,7 +7,7 @@ import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import { router } from "./routes/apiRouter";
 import { config } from "./config";
-
+import { connection } from "./utils/database";
 // Load environment variables from a .env file (if present)
 dotenv.config();
 
@@ -35,7 +35,9 @@ app.use(compression() as express.RequestHandler);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // API routing middleware
-app.use("/", router);
+if (connection) {
+  app.use("/", router)
+}
 
 // Error-handling middleware without the unused next parameter
 app.use((err: Error, req: Request, res: Response, _: NextFunction) => {

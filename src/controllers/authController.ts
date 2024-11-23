@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
-import { prisma } from "../prisma/client";
-import { hashSync, compareSync } from "bcrypt";
+import argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import { validateField } from "../utils/validateField";
 import { ERROR_MESSAGES } from "../utils/errorMessages";
@@ -11,16 +10,7 @@ import {
 } from "../utils/validateData";
 import { config } from "../config";
 import { AuthLoginBody, AuthRegisterBody } from "../utils/interfacesRequest";
-
-// Create a user or manager
-async function createUserOrManager(schema: any, data: any) {
-  return await schema.create({ data });
-}
-
-// Find a user or manager by email
-async function findUserOrManager(schema: any, email: any) {
-  return await schema.findFirst({ where: { email } });
-}
+import { customerServiceCreate, customerServiceFindByEmail } from "../services/customerService";
 
 export const authRegister = async (
   req: Request<object, object, AuthRegisterBody>,
@@ -38,25 +28,27 @@ export const authRegister = async (
       return;
     }
 
-    // Check if the user is a manager
-    const schema = manager ? prisma.manager : prisma.user;
-
     // Check if the user already exists
-    const userExists = await findUserOrManager(schema, email);
+    const userExists = await customerServiceFindByEmail(email);
+
     if (userExists) {
       return res.status(409).json(ERROR_MESSAGES.contentDuplicate("email"));
     }
 
     // Hash the password
-    const hash = hashSync(password, 10);
+    const hash = await argon2.hash(password,
+      {
+        type: argon2.argon2id,
+        memoryCost: 2 ** 14,
+        timeCost: 2,
+        parallelism: 1,
+        hashLength: 32,
+      }
+    );
     if (!hash) throw new Error("HashError");
 
     // Create the user or manager
-    const user = await createUserOrManager(schema, {
-      email,
-      password: hash,
-      name,
-    });
+    const user = await customerServiceCreate(email, hash);
     if (!user) throw new Error("UserCreationError");
 
     res.status(201).json(user);
@@ -92,14 +84,20 @@ export const authLogin = async (
     }
 
     // Check if the user is a manager
-    const schema = manager ? prisma.manager : prisma.user;
+    const schema = null; //manager ? prisma.manager : prisma.user;
 
     // Find the user or manager
-    const existingUser = await findUserOrManager(schema, email);
-    if (
-      !existingUser?.password ||
-      !compareSync(password, existingUser.password)
-    ) {
+    const existingUser: any = await customerServiceFindByEmail(email);
+
+    const user = existingUser[0];
+
+    if (!user) {
+      return res.status(401).json(ERROR_MESSAGES.invalidCredentials("form"));
+    }
+
+    const isValid = await argon2.verify(user.password, password);
+
+    if (!isValid) {
       return res.status(401).json(ERROR_MESSAGES.invalidCredentials("form"));
     }
 
@@ -109,7 +107,10 @@ export const authLogin = async (
     }
 
     // Create a JWT token
-    const token = jwt.sign({ id: existingUser.id, scope: manager ? "manager" : "user" }, config.JWT_SECRET);
+    const token = jwt.sign(
+      { id: user.id, scope: "manager" },
+      config.JWT_SECRET
+    );
     if (!token) throw new Error("TokenError");
 
     res.status(200).json({ token });
