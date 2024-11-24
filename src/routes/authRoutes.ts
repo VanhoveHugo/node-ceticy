@@ -8,7 +8,7 @@ const authRouter: Router = Router();
  * /auth/signup:
  *   post:
  *     tags: [Auth]
- *     summary: Register a new user
+ *     summary: Register a new user or manager
  *     requestBody:
  *       required: true
  *       content:
@@ -27,9 +27,12 @@ const authRouter: Router = Router();
  *                 type: string
  *                 format: password
  *                 example: Hugo123#
+ *               scope:
+ *                 type: string
+ *                 example: user
  *     responses:
  *       201:
- *         description: "{ user }"
+ *         description: "{ email }"
  *       400:
  *         description: "{ kind: error_code, content: invalid_field  }"
  *       500:
@@ -42,7 +45,7 @@ authRouter.post("/signup", authRegister);
  * /auth/signin:
  *   post:
  *     tags: [Auth]
- *     summary: Login a existing user
+ *     summary: Login a existing user or manager
  *     requestBody:
  *       required: true
  *       content:
@@ -58,6 +61,9 @@ authRouter.post("/signup", authRegister);
  *                 type: string
  *                 format: password
  *                 example: Hugo123#
+ *               scope:
+ *                 type: string
+ *                 example: user
  *     responses:
  *       201:
  *         description: "{ token }"

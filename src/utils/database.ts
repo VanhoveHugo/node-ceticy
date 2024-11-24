@@ -30,7 +30,7 @@ const connectWithRetry = () => {
       // Tentative de reconnexion après 10 secondes
       setTimeout(connectWithRetry, 10000);
     } else {
-      console.log("[API] MySQL connected");
+      console.info("[API] MySQL connected");
       keepAlive(); // Garde la connexion active
     }
   });
@@ -49,7 +49,7 @@ const keepAlive = () => {
     if (connection) {
       connection.ping((err: QueryError | null) => {
         if (err) {
-          console.error("[API] Ping error: ", err);
+          console.warn("[API] Ping error: ", err);
           connectWithRetry(); // Reconnexion en cas d'erreur de ping
         }
       });
