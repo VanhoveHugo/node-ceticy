@@ -9,6 +9,7 @@ import {
   getListOfRestaurants,
   updateRestaurant,
 } from "../controllers/restaurantController";
+import upload from "../utils/configMulter";
 
 const restaurantRouter = Router();
 
@@ -47,7 +48,7 @@ restaurantRouter.use(managerMiddleware);
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
@@ -69,15 +70,18 @@ restaurantRouter.use(managerMiddleware);
  *                 type: number
  *                 format: number
  *                 example: "0612345678"
+ *               thumbnail:
+ *                 type: string
+ *                 format: binary
  *     responses:
  *       201:
- *         description: "{ restaurant }"
+ *         description: "{ restaurantId }"
  *       400:
  *         description: "{ kind: error_code, content: invalid_field  }"
  *       500:
  *         description: "{ kind: 'server_error', content: reason }"
  */
-restaurantRouter.post("/", addRestaurant);
+restaurantRouter.post("/", upload.single("thumbnail"), addRestaurant);
 
 /**
  * @swagger

@@ -15,7 +15,9 @@ export const restaurantServiceCreate = async (
       .query(
         "INSERT INTO restaurants (name, ownerId, description, averagePrice, averageService, phoneNumber) VALUES (?, ?, ?, ?, ?, ?)",
         [name, ownerId, description, averagePrice, averageService, phoneNumber]
-      );
+    );
+
+    return res[0].insertId;
   } catch (error: string | unknown) {
     console.error("Error during restaurant creation:", error);
   }

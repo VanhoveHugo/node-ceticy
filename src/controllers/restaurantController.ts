@@ -4,6 +4,7 @@ import {
   restaurantServiceGetList,
 } from "../services/restaurantService";
 import { RestaurantCreateBody } from "../utils/interfacesRequest";
+import { photoServiceCreate } from "../services/photoService";
 
 declare module "express-serve-static-core" {
   interface Request {
@@ -11,6 +12,7 @@ declare module "express-serve-static-core" {
       id: number;
       manager: boolean;
     };
+    file?: any;
   }
 }
 
@@ -38,8 +40,14 @@ export const addRestaurant = async (req: Request, res: Response) => {
     averageService,
     phoneNumber,
   }: RestaurantCreateBody = req.body;
+  const file = req.file;
+
   if (!req.user) {
     return res.status(400).json({ message: "User not found" });
+  }
+
+  if (!file) {
+    return res.status(400).json({ message: "Image not found" });
   }
 
   try {
@@ -47,8 +55,7 @@ export const addRestaurant = async (req: Request, res: Response) => {
 
     // TODO: Check if manager can add a restaurant FREE or PREMIUM
 
-    // Create a restaurant
-    const restaurant = await restaurantServiceCreate(
+    const restaurantId = await restaurantServiceCreate(
       name,
       req.user.id,
       description,
@@ -57,7 +64,13 @@ export const addRestaurant = async (req: Request, res: Response) => {
       phoneNumber
     );
 
-    return res.status(201).json(restaurant);
+    const thumbnailId = await photoServiceCreate(restaurantId, file.path);
+
+    if (!thumbnailId) {
+      return res.status(500).json({ message: "Internal server error" });
+    }
+
+    return res.status(201).json(restaurantId);
   } catch (error: unknown) {
     console.error("Error during restaurant creation:", error);
     return res.status(500).json({ message: "Internal server error" });
