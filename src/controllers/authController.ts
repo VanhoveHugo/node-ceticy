@@ -11,12 +11,13 @@ import {
 import { config } from "../config";
 import { AuthLoginBody, AuthRegisterBody } from "../utils/interfacesRequest";
 import { customerServiceCreate, customerServiceFindByEmail } from "../services/customerService";
+import { managerServiceCreate, managerServiceFindByEmail } from "../services/managerService";
 
 export const authRegister = async (
   req: Request<object, object, AuthRegisterBody>,
   res: Response
 ) => {
-  const { email, password, name, manager }: AuthRegisterBody = req.body;
+  const { email, password, name, scope }: AuthRegisterBody = req.body;
 
   try {
     // Check if all required fields are present and valid
@@ -28,10 +29,21 @@ export const authRegister = async (
       return;
     }
 
-    // Check if the user already exists
-    const userExists = await customerServiceFindByEmail(email);
+    if (scope !== "user" && scope !== "manager") {
+      return res.status(400).json(ERROR_MESSAGES.contentInvalid("scope"));
+    }
 
-    if (userExists) {
+    let emailExists = null;
+
+    if (scope === "user") {
+      // Check if the user already exists
+      emailExists = await customerServiceFindByEmail(email);
+    } else if (scope === "manager") {
+      // Check if the manager already exists
+      emailExists = await managerServiceFindByEmail(email);
+    }
+
+    if (emailExists) {
       return res.status(409).json(ERROR_MESSAGES.contentDuplicate("email"));
     }
 
@@ -48,10 +60,17 @@ export const authRegister = async (
     if (!hash) throw new Error("HashError");
 
     // Create the user or manager
-    const user = await customerServiceCreate(email, hash);
+    let user = null;
+
+    if (scope === "user") {
+      user = await customerServiceCreate(email, hash);
+    } else if (scope === "manager") {
+      user = await managerServiceCreate(email, hash);
+    }
+
     if (!user) throw new Error("UserCreationError");
 
-    res.status(201).json(user);
+    res.status(201).json({email});
   } catch (error: unknown) {
     console.error("Error during user registration:", error);
 
@@ -72,7 +91,7 @@ export const authLogin = async (
   req: Request<object, object, AuthLoginBody>,
   res: Response
 ) => {
-  const { email, password, manager }: AuthLoginBody = req.body;
+  const { email, password, scope }: AuthLoginBody = req.body;
 
   try {
     // Check if all required fields are present and valid
@@ -83,18 +102,25 @@ export const authLogin = async (
       return;
     }
 
-    // Check if the user is a manager
-    const schema = null; //manager ? prisma.manager : prisma.user;
+    if (scope !== "user" && scope !== "manager") {
+      return res.status(400).json(ERROR_MESSAGES.contentInvalid("scope"));
+    }
 
-    // Find the user or manager
-    const existingUser: any = await customerServiceFindByEmail(email);
+    let emailExists = null;
 
-    const user = existingUser[0];
+    if (scope === "user") {
+      // Check if the user already exists
+      emailExists = await customerServiceFindByEmail(email);
+    } else if (scope === "manager") {
+      // Check if the manager already exists
+      emailExists = await managerServiceFindByEmail(email);
+    }
 
-    if (!user) {
+    if (!emailExists) {
       return res.status(401).json(ERROR_MESSAGES.invalidCredentials("form"));
     }
 
+    const user = emailExists[0];
     const isValid = await argon2.verify(user.password, password);
 
     if (!isValid) {
@@ -108,7 +134,7 @@ export const authLogin = async (
 
     // Create a JWT token
     const token = jwt.sign(
-      { id: user.id, scope: "user" },
+      { id: user.id, scope: scope },
       config.JWT_SECRET
     );
     if (!token) throw new Error("TokenError");
