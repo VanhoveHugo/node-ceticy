@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import {
   restaurantServiceCreate,
   restaurantServiceGetList,
+  restaurantServiceHandleSwipe,
 } from "../services/restaurantService";
 import { RestaurantCreateBody } from "../utils/interfacesRequest";
 import { photoServiceCreate } from "../services/photoService";
@@ -18,8 +19,9 @@ declare module "express-serve-static-core" {
 
 export const getListOfRestaurants = async (req: Request, res: Response) => {
   try {
+    if (!req.user) return res.status(400).json({ message: "User not found" });
     // Get a list of restaurants
-    const restaurants = await restaurantServiceGetList();
+    const restaurants = await restaurantServiceGetList(req.user.id);
 
     return res.status(200).json(restaurants);
   } catch (error: unknown) {
@@ -83,4 +85,18 @@ export const updateRestaurant = (req: Request, res: Response) => {
 
 export const deleteRestaurant = (req: Request, res: Response) => {
   return res.status(200).json({ message: "in progress" });
+};
+
+export const handleRestaurantSwipe = (req: Request, res: Response) => {
+  const { action, restaurantId } = req.body;
+
+  if (!req.user) return res.status(400).json({ message: "User not found" });
+
+  if (!restaurantId) return res.status(400).json({ message: "Restaurant ID not found" });
+
+  let data = restaurantServiceHandleSwipe(restaurantId, req.user.id, action == "like");
+
+  if (!data) return res.status(500).json({ message: "Internal server error" });
+
+  return res.status(201).json(data);
 };

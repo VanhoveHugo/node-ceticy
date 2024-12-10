@@ -12,7 +12,7 @@ export interface AuthLoginBody {
 }
 
 export interface FriendCreateBody {
-  friendId: number;
+  email: string;
 }
 
 export interface RestaurantCreateBody {

@@ -7,7 +7,7 @@ let connection: Connection | null = null;
 const connectWithRetry = () => {
   // Vérification que les variables d'environnement sont définies
   const host = process.env.MYSQL_HOST;
-  const user = process.env.MYSQL_USER;
+  const user = "root";
   const password = process.env.MYSQL_ROOT_PASSWORD;
   const database = process.env.MYSQL_NAME;
 

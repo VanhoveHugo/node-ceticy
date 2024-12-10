@@ -8,6 +8,7 @@ import {
   deleteRestaurant,
   getListOfRestaurants,
   updateRestaurant,
+  handleRestaurantSwipe,
 } from "../controllers/restaurantController";
 import upload from "../utils/configMulter";
 
@@ -32,6 +33,37 @@ restaurantRouter.use(authMiddleware);
  *         description: "{ kind: 'server_error', content: reason }"
  */
 restaurantRouter.get("/", getListOfRestaurants);
+
+/**
+ * @swagger
+ * /restaurants/swipe:
+ *   post:
+ *     tags: [Restaurants]
+ *     summary: Handle a swipe on a restaurant
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               action:
+ *                 type: string
+ *                 example: like
+ *               restaurantId:
+ *                 type: string
+ *                 example: 10
+ *     responses:
+ *       201:
+ *         description: "{ success }"
+ *       400:
+ *         description: "{ kind: error_code, content: invalid_field  }"
+ *       500:
+ *         description: "{ kind: 'server_error', content: reason }"
+ */
+restaurantRouter.post("/swipe", handleRestaurantSwipe);
 
 // Manager Only
 

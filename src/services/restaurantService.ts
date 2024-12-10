@@ -1,4 +1,5 @@
 import { connection } from "../utils/database";
+import { photoServiceGetByRestaurantId } from "./photoService";
 
 export const restaurantServiceCreate = async (
   name: string,
@@ -15,7 +16,7 @@ export const restaurantServiceCreate = async (
       .query(
         "INSERT INTO restaurants (name, ownerId, description, averagePrice, averageService, phoneNumber) VALUES (?, ?, ?, ?, ?, ?)",
         [name, ownerId, description, averagePrice, averageService, phoneNumber]
-    );
+      );
 
     return res[0].insertId;
   } catch (error: string | unknown) {
@@ -23,13 +24,49 @@ export const restaurantServiceCreate = async (
   }
 };
 
-export const restaurantServiceGetList = async () => {
+export const restaurantServiceGetList = async (customerId: number) => {
   if (!connection) return;
   try {
-    const res = await connection.promise().query("SELECT * FROM restaurants");
+    const res = await connection.promise().query(
+      `SELECT r.id, r.name, r.description, r.averagePrice, r.averageService, r.phoneNumber
+        FROM restaurants r
+        LEFT JOIN swipes s ON r.id = s.restaurantId AND s.userId = ?
+        WHERE s.userId IS NULL`,
+      [customerId]
+    );
 
-    return res[0];
+    let data: any = res[0];
+
+    data = await Promise.all(
+      data.map(async (restaurant: any) => {
+        const photos = await photoServiceGetByRestaurantId(restaurant.id);
+        return { ...restaurant, photos };
+      })
+    );
+
+    return data;
   } catch (error: string | unknown) {
     console.error("Error during restaurant creation:", error);
+  }
+};
+
+export const restaurantServiceHandleSwipe = async (
+  restaurantId: number,
+  customerId: number,
+  liked: boolean
+) => {
+  if (!connection) return;
+  try {
+    await connection
+      .promise()
+      .query(
+        "INSERT INTO swipes (restaurantId, userId, liked) VALUES (?, ?, ?)",
+        [restaurantId, customerId, liked]
+      );
+
+    return true;
+  } catch (error: string | unknown) {
+    console.error("Error during swipe:", error);
+    return false;
   }
 };

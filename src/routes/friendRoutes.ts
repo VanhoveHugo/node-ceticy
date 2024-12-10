@@ -53,7 +53,7 @@ friendsRouter.get("/requests", getFriendRequests);
  * /friends/:
  *   post:
  *     tags: [Friends]
- *     summary: Send a friend request
+ *     summary: Send a friend request user only
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -63,10 +63,9 @@ friendsRouter.get("/requests", getFriendRequests);
  *           schema:
  *             type: object
  *             properties:
- *               friendId:
- *                 type: number
- *                 format: number
- *                 example: 1
+ *               email:
+ *                 type: string
+ *                 example: test@example.com
  *     responses:
  *       201:
  *         description: "{ token }"

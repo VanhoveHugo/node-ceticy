@@ -31,6 +31,12 @@ app.use(
 app.use(cors() as express.RequestHandler);
 app.use(compression() as express.RequestHandler);
 
+app.use((req, res, next) => {
+  console.info(`${req.method} ${req.originalUrl}`);
+  console.info(`Request Body: ${JSON.stringify(req.body)}`);
+  next();
+});
+
 // Set up Swagger UI
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
