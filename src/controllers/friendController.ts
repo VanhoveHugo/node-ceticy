@@ -2,12 +2,22 @@ import { Request, Response } from "express";
 import { validateField } from "../utils/validateField";
 import { ERROR_MESSAGES } from "../utils/errorMessages";
 import { validateNumber } from "../utils/validateData";
-import { customerServiceFindById } from "../services/customerService";
+import { customerServiceFindByEmail } from "../services/customerService";
 import {
   friendServiceCreate,
   friendServiceFindByIds,
+  friendServiceHandleStatus,
 } from "../services/friendService";
-import { FriendCreateBody } from "../utils/interfacesRequest";
+``
+declare module "express-serve-static-core" {
+  interface Request {
+    user?: {
+      id: number;
+      manager: boolean;
+    };
+    file?: any;
+  }
+}
 
 export const getFriends = (req: Request, res: Response) => {
   return res.status(200).json({ message: "in progress" });
@@ -18,20 +28,15 @@ export const getFriendRequests = (req: Request, res: Response) => {
 };
 
 export const addFriendRequest = async (
-  req: Request<object, object, FriendCreateBody>,
+  req: Request,
   res: Response
 ) => {
-  const { friendId }: FriendCreateBody = req.body;
+  const { email } = req.body;
 
-  if (!validateField(friendId, validateNumber, "friendId", res)) {
-    return res
-      .status(400)
-      .json({ message: ERROR_MESSAGES.contentMissing("friendId") });
-  }
   try {
-    const targetUser: any = await customerServiceFindById(friendId);
+    const targetUser: any = await customerServiceFindByEmail(email);
 
-    let targerId = Number(targetUser?.id);
+    let targerId = targetUser[0]?.id;
 
     if (!targetUser || !req.user?.id)
       return res
@@ -41,7 +46,7 @@ export const addFriendRequest = async (
     if (targerId === req.user?.id)
       return res
         .status(400)
-        .json({ message: ERROR_MESSAGES.contentInvalid("id") });
+        .json({ message: ERROR_MESSAGES.contentInvalid("email") });
 
     const existingFriendRequest = await friendServiceFindByIds(
       req.user?.id,
@@ -51,24 +56,32 @@ export const addFriendRequest = async (
     if (existingFriendRequest)
       return res
         .status(400)
-        .json({ message: ERROR_MESSAGES.contentDuplicate("id") });
+        .json({ message: ERROR_MESSAGES.contentDuplicate("email") });
 
     const existingFriendRequestReverse = await friendServiceFindByIds(
       targerId,
       req.user?.id
     );
 
-    if (existingFriendRequestReverse)
-      return res
-        .status(400)
-        .json({ message: ERROR_MESSAGES.contentDuplicate("id") });
+    // If the target already sent a friend request, accept it
+    if (existingFriendRequestReverse) {
+      const friendRequest = await friendServiceHandleStatus(
+        existingFriendRequestReverse[0].id,
+        "accept"
+      );
+
+      if (!friendRequest) throw new Error("Friend request not accepted");
+
+      return res.status(201).json({ message: "Friend request accepted" });
+    }
 
     const friendRequest = await friendServiceCreate(req.user?.id, targerId);
 
     if (!friendRequest) throw new Error("Friend request not created");
 
-    return res.status(201).json(friendRequest);
+    return res.status(201).json({ message: "Friend request sent" });
   } catch (error) {
+    console.error("Error during friend request creation:", error);
     res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
   }
 };

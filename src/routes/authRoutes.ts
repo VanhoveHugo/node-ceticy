@@ -1,5 +1,9 @@
 import { Router } from "express";
-import { authLogin, authRegister } from "../controllers/authController";
+import {
+  authLogin,
+  authRegister,
+  authAccount,
+} from "../controllers/authController";
 
 const authRouter: Router = Router();
 
@@ -73,5 +77,22 @@ authRouter.post("/signup", authRegister);
  *         description: "{ kind: 'server_error', content: reason }"
  */
 authRouter.post("/signin", authLogin);
+
+/**
+ * @swagger
+ * /auth/account:
+ *   get:
+ *     tags: [Auth]
+ *     summary: Show account information
+*     responses:
+ *       201:
+ *         description: "{ user or manager }"
+ *       400:
+ *         description: "{ kind: error_code, content: invalid_field  }"
+ *       500:
+ *         description: "{ kind: 'server_error', content: reason }"
+ */
+authRouter.get("/account", authAccount);
+
 
 export { authRouter };

@@ -8,7 +8,10 @@ import {
   deleteRestaurant,
   getListOfRestaurants,
   updateRestaurant,
+  handleRestaurantSwipe,
+  getRestaurantsByManagerId,
 } from "../controllers/restaurantController";
+import upload from "../utils/configMulter";
 
 const restaurantRouter = Router();
 
@@ -16,7 +19,7 @@ restaurantRouter.use(authMiddleware);
 
 /**
  * @swagger
- * /restaurants/:
+ * /restaurants/list:
  *   get:
  *     tags: [Restaurants]
  *     summary: Get a selection of restaurants
@@ -30,11 +33,60 @@ restaurantRouter.use(authMiddleware);
  *       500:
  *         description: "{ kind: 'server_error', content: reason }"
  */
-restaurantRouter.get("/", getListOfRestaurants);
+restaurantRouter.get("/list", getListOfRestaurants);
+
+/**
+ * @swagger
+ * /restaurants/swipe:
+ *   post:
+ *     tags: [Restaurants]
+ *     summary: Handle a swipe on a restaurant
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               action:
+ *                 type: string
+ *                 example: like
+ *               restaurantId:
+ *                 type: string
+ *                 example: 10
+ *     responses:
+ *       201:
+ *         description: "{ success }"
+ *       400:
+ *         description: "{ kind: error_code, content: invalid_field  }"
+ *       500:
+ *         description: "{ kind: 'server_error', content: reason }"
+ */
+restaurantRouter.post("/swipe", handleRestaurantSwipe);
 
 // Manager Only
 
 restaurantRouter.use(managerMiddleware);
+
+/**
+ * @swagger
+ * /restaurants/:
+ *   get:
+ *     tags: [Restaurants]
+ *     summary: Get all restaurants of a manager
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200  :
+ *         description: "{ list of restaurants }"
+ *       400:
+ *         description: "{ kind: error_code, content: invalid_field  }"
+ *       500:
+ *         description: "{ kind: 'server_error', content: reason }"
+ */
+restaurantRouter.get("/", getRestaurantsByManagerId);
 
 /**
  * @swagger
@@ -47,7 +99,7 @@ restaurantRouter.use(managerMiddleware);
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
@@ -69,15 +121,18 @@ restaurantRouter.use(managerMiddleware);
  *                 type: number
  *                 format: number
  *                 example: "0612345678"
+ *               thumbnail:
+ *                 type: string
+ *                 format: binary
  *     responses:
  *       201:
- *         description: "{ restaurant }"
+ *         description: "{ restaurantId }"
  *       400:
  *         description: "{ kind: error_code, content: invalid_field  }"
  *       500:
  *         description: "{ kind: 'server_error', content: reason }"
  */
-restaurantRouter.post("/", addRestaurant);
+restaurantRouter.post("/", upload.single("thumbnail"), addRestaurant);
 
 /**
  * @swagger
