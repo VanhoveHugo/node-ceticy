@@ -50,6 +50,19 @@ export const restaurantServiceGetList = async (customerId: number) => {
   }
 };
 
+export const restaurantServiceGetByManagerId = async (managerId: number) => {
+  if (!connection) return;
+  try {
+    const res = await connection
+      .promise()
+      .query("SELECT * FROM restaurants WHERE ownerId = ?", [managerId]);
+
+    return res[0];
+  } catch (error: string | unknown) {
+    console.error("Error during restaurant creation:", error);
+  }
+}
+
 export const restaurantServiceHandleSwipe = async (
   restaurantId: number,
   customerId: number,

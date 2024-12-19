@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import {
   restaurantServiceCreate,
+  restaurantServiceGetByManagerId,
   restaurantServiceGetList,
   restaurantServiceHandleSwipe,
 } from "../services/restaurantService";
@@ -30,8 +31,15 @@ export const getListOfRestaurants = async (req: Request, res: Response) => {
   }
 };
 
-export const getRestaurantsByManagerId = (req: Request, res: Response) => {
-  return res.status(200).json({ message: "in progress" });
+export const getRestaurantsByManagerId = async (req: Request, res: Response) => {
+  if(!req.user) return res.status(400).json({ message: "User not found" });
+  let managerId = req.user.id;
+  if (!managerId) return res.status(400).json({ message: "Manager ID not found" });
+
+  let data = await restaurantServiceGetByManagerId(managerId);
+  if (!data) return res.status(500).json({ message: "Internal server error" });
+
+  return res.status(200).json(data);
 };
 
 export const addRestaurant = async (req: Request, res: Response) => {
@@ -48,10 +56,6 @@ export const addRestaurant = async (req: Request, res: Response) => {
     return res.status(400).json({ message: "User not found" });
   }
 
-  if (!file) {
-    return res.status(400).json({ message: "Image not found" });
-  }
-
   try {
     // TODO: Handle Data Validation
 
@@ -66,10 +70,12 @@ export const addRestaurant = async (req: Request, res: Response) => {
       phoneNumber
     );
 
-    const thumbnailId = await photoServiceCreate(restaurantId, file.path);
+    if(file) {
+      let thumbnailId = await photoServiceCreate(restaurantId, file.path);
 
-    if (!thumbnailId) {
-      return res.status(500).json({ message: "Internal server error" });
+      if (!thumbnailId) {
+        return res.status(500).json({ message: "Internal server error" });
+      }
     }
 
     return res.status(201).json(restaurantId);

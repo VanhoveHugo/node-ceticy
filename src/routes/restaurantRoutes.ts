@@ -9,6 +9,7 @@ import {
   getListOfRestaurants,
   updateRestaurant,
   handleRestaurantSwipe,
+  getRestaurantsByManagerId,
 } from "../controllers/restaurantController";
 import upload from "../utils/configMulter";
 
@@ -18,7 +19,7 @@ restaurantRouter.use(authMiddleware);
 
 /**
  * @swagger
- * /restaurants/:
+ * /restaurants/list:
  *   get:
  *     tags: [Restaurants]
  *     summary: Get a selection of restaurants
@@ -32,7 +33,7 @@ restaurantRouter.use(authMiddleware);
  *       500:
  *         description: "{ kind: 'server_error', content: reason }"
  */
-restaurantRouter.get("/", getListOfRestaurants);
+restaurantRouter.get("/list", getListOfRestaurants);
 
 /**
  * @swagger
@@ -68,6 +69,24 @@ restaurantRouter.post("/swipe", handleRestaurantSwipe);
 // Manager Only
 
 restaurantRouter.use(managerMiddleware);
+
+/**
+ * @swagger
+ * /restaurants/:
+ *   get:
+ *     tags: [Restaurants]
+ *     summary: Get all restaurants of a manager
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200  :
+ *         description: "{ list of restaurants }"
+ *       400:
+ *         description: "{ kind: error_code, content: invalid_field  }"
+ *       500:
+ *         description: "{ kind: 'server_error', content: reason }"
+ */
+restaurantRouter.get("/", getRestaurantsByManagerId);
 
 /**
  * @swagger
