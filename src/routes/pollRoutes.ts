@@ -1,59 +1,35 @@
 import { Router } from "express";
-import {
-  addFriendRequest,
-  deleteFriendRequest,
-  getFriendRequests,
-  getFriends,
-  updateFriendRequest,
-} from "../controllers/friendController";
 import { authMiddleware } from "../middleware/authMiddleware";
+import { addPoll, deletePoll, getPolls, updatePoll } from "../controllers/pollController";
 
-const friendsRouter = Router();
+const pollRouter = Router();
 
-friendsRouter.use(authMiddleware);
+pollRouter.use(authMiddleware);
 
 /**
  * @swagger
- * /friends/:
+ * /polls:
  *   get:
  *     tags: [Todo]
- *     summary: Get all friends of the user
+ *     summary: Get all polls
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200  :
- *         description: "{ friends }"
+ *         description: "{ list of polls }"
  *       400:
  *         description: "{ kind: error_code, content: invalid_field  }"
  *       500:
  *         description: "{ kind: 'server_error', content: reason }"
  */
-friendsRouter.get("/", getFriends);
+pollRouter.get("/", getPolls);
 
 /**
  * @swagger
- * /friends/requests/:
- *   get:
- *     tags: [Todo]
- *     summary: Get friends requests of the user
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200  :
- *         description: "{ friendsRequests }"
- *       400:
- *         description: "{ kind: error_code, content: invalid_field  }"
- *       500:
- *         description: "{ kind: 'server_error', content: reason }"
- */
-friendsRouter.get("/requests", getFriendRequests);
-
-/**
- * @swagger
- * /friends/:
+ * /polls:
  *   post:
- *     tags: [Friends]
- *     summary: Send a friend request user only
+ *     tags: [Polls]
+ *     summary: Get all polls
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -63,25 +39,25 @@ friendsRouter.get("/requests", getFriendRequests);
  *           schema:
  *             type: object
  *             properties:
- *               email:
+ *               name:
  *                 type: string
- *                 example: test@example.com
+ *                 example: Romantique
  *     responses:
- *       201:
- *         description: "{ token }"
+ *       201  :
+ *         description: "{ pollId }"
  *       400:
  *         description: "{ kind: error_code, content: invalid_field  }"
  *       500:
  *         description: "{ kind: 'server_error', content: reason }"
  */
-friendsRouter.post("/", addFriendRequest);
+pollRouter.post("/", addPoll);
 
 /**
  * @swagger
- * /friends/:
+ * /polls/:
  *   put:
- *     tags: [Todo]
- *     summary: Update a friend request (accept or refuse)
+ *     tags: [Polls]
+ *     summary: Update a poll
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -91,30 +67,28 @@ friendsRouter.post("/", addFriendRequest);
  *           schema:
  *             type: object
  *             properties:
- *               requestId:
- *                 type: number
- *                 format: number
- *                 example: 1
- *               status:
+ *               name:
  *                 type: string
- *                 format: string
- *                 example: "accept"
+ *                 example: Chill
+ *               pollId:
+ *                 type: number
+ *                 example: 1
  *     responses:
- *       201:
- *         description: "{ success }"
+ *       200  :
+ *         description: "{ pollId }"
  *       400:
  *         description: "{ kind: error_code, content: invalid_field  }"
  *       500:
  *         description: "{ kind: 'server_error', content: reason }"
  */
-friendsRouter.put("/", updateFriendRequest);
+pollRouter.put("/", updatePoll);
 
 /**
  * @swagger
- * /friends/:
+ * /polls/:
  *   delete:
- *     tags: [Todo]
- *     summary: Delete a friend request
+ *     tags: [Polls]
+ *     summary: Delete a poll
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -124,18 +98,17 @@ friendsRouter.put("/", updateFriendRequest);
  *           schema:
  *             type: object
  *             properties:
- *               requestId:
+ *               pollId:
  *                 type: number
- *                 format: number
  *                 example: 1
  *     responses:
- *       201:
- *         description: "{ success }"
+ *       200  :
+ *         description: "{ pollId }"
  *       400:
  *         description: "{ kind: error_code, content: invalid_field  }"
  *       500:
  *         description: "{ kind: 'server_error', content: reason }"
  */
-friendsRouter.delete("/", deleteFriendRequest);
+pollRouter.delete("/", deletePoll);
 
-export { friendsRouter };
+export { pollRouter };

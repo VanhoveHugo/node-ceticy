@@ -57,11 +57,20 @@ export const restaurantServiceGetByManagerId = async (managerId: number) => {
       .promise()
       .query("SELECT * FROM restaurants WHERE ownerId = ?", [managerId]);
 
-    return res[0];
+    let data: any = res[0];
+
+    data = await Promise.all(
+      data.map(async (restaurant: any) => {
+        const photos = await photoServiceGetByRestaurantId(restaurant.id);
+        return { ...restaurant, photos };
+      })
+    );
+
+    return data;
   } catch (error: string | unknown) {
     console.error("Error during restaurant creation:", error);
   }
-}
+};
 
 export const restaurantServiceHandleSwipe = async (
   restaurantId: number,
@@ -81,5 +90,50 @@ export const restaurantServiceHandleSwipe = async (
   } catch (error: string | unknown) {
     console.error("Error during swipe:", error);
     return false;
+  }
+};
+
+export const restaurantServiceGetCount = async (customerId: number) => {
+  if (!connection) return;
+  try {
+    const [res]: any = await connection
+      .promise()
+      .query(
+        `SELECT COUNT(*) as count FROM swipes WHERE userId = ? AND liked = 1`,
+        [customerId]
+      );
+
+    return res[0].count;
+  } catch (error: string | unknown) {
+    console.error("Error during restaurant count:", error);
+  }
+};
+
+export const restaurantServiceGetLike = async (customerId: number) => {
+  if (!connection) return;
+  try {
+    const res = await connection.promise().query(
+      `SELECT * FROM restaurants r
+        JOIN swipes s ON r.id = s.restaurantId
+        WHERE s.userId = ?
+        AND s.liked = 1
+        ORDER BY s.timestamp DESC`,
+      [customerId]
+    );
+
+    let data: any = res[0];
+
+    data = await Promise.all(
+      data.map(async (restaurant: any) => {
+        const photos = await photoServiceGetByRestaurantId(
+          restaurant.restaurantId
+        );
+        return { ...restaurant, photos };
+      })
+    );
+
+    return data;
+  } catch (error: string | unknown) {
+    console.error("Error during restaurant creation:", error);
   }
 };

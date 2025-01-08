@@ -2,6 +2,7 @@ import { Router } from "express";
 import { authRouter } from "./authRoutes";
 import { friendsRouter } from "./friendRoutes";
 import { restaurantRouter } from "./restaurantRoutes";
+import { pollRouter } from "./pollRoutes";
 
 const router: Router = Router();
 
@@ -28,6 +29,15 @@ router.use("/friends", friendsRouter);
  *     description: Manage restaurants
  */
 router.use("/restaurants", restaurantRouter);
+
+
+/**
+ * @swagger
+ * tags:
+ *   - name: Polls
+ *     description: Manage polls
+ */
+router.use("/polls", pollRouter);
 
 /**
  * @swagger

@@ -56,3 +56,19 @@ export const friendServiceHandleStatus = async(
     console.error("Error during user registration:", error);
   }
 }
+
+export const friendServiceGetCount = async (userId: number) => {
+  if (!connection) return;
+  try {
+    const [res]: any = await connection
+      .promise()
+      .query(`SELECT COUNT(*) as count FROM friends WHERE (user1Id = ? OR user2Id = ?) AND status = 'accept'`, [
+        userId,
+        userId,
+      ]);
+
+    return res[0].count;
+  } catch (error: string | unknown) {
+    console.error("Error during user registration:", error);
+  }
+}
