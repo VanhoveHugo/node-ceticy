@@ -46,4 +46,8 @@ router.use("/polls", pollRouter);
  *     description: Features come soon
  */
 
+router.get("/version", (req, res) => {
+  res.json({ version: process.env.npm_package_version });
+});
+
 export { router };

@@ -1,5 +1,6 @@
+const version = process.env.npm_package_version || "1.0.0";
+
 export const config = {
-  PORT: process.env.PORT ?? 3000,
   JWT_SECRET: process.env.JWT_SECRET ?? "secret",
   NODE_ENV: process.env.NODE_ENV ?? "development",
   SWAGGER_OPTIONS: {
@@ -7,11 +8,12 @@ export const config = {
       openapi: "3.0.0",
       info: {
         title: "Ceticy",
-        version: "1.0.0",
+        version: version,
         description: "API documentation for Ceticy Application",
         contact: {
           name: "Hugo V.",
           url: "https://vanhovehugo.dev",
+          email: "contact@vanhovehugo.dev"
         },
       },
       servers: [
@@ -19,13 +21,17 @@ export const config = {
           url: "http://localhost:3000",
           description: "Development",
         },
+        {
+          url: "https://api.ceticy.fr",
+          description: "Production",
+        },
       ],
       components: {
         securitySchemes: {
           bearerAuth: {
             type: "http",
             scheme: "bearer",
-            bearerFormat: "JWT", // Indiquez que le format est un JWT
+            bearerFormat: "JWT",
           },
         },
       },

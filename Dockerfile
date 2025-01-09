@@ -10,9 +10,6 @@ COPY package*.json ./
 # Installer toutes les dépendances, y compris les dépendances de développement
 RUN npm install
 
-# Copier le reste des fichiers de l'application
-COPY . .
-
 # Exposer le port
 EXPOSE 3000
 
