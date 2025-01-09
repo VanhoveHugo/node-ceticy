@@ -3,6 +3,7 @@ import {
   restaurantServiceCreate,
   restaurantServiceGetByManagerId,
   restaurantServiceGetList,
+  restaurantServiceGetLike,
   restaurantServiceHandleSwipe,
 } from "../services/restaurantService";
 import { RestaurantCreateBody } from "../utils/interfacesRequest";
@@ -46,7 +47,7 @@ export const addRestaurant = async (req: Request, res: Response) => {
   const {
     name,
     description,
-    averagePrive,
+    averagePrice,
     averageService,
     phoneNumber,
   }: RestaurantCreateBody = req.body;
@@ -65,7 +66,7 @@ export const addRestaurant = async (req: Request, res: Response) => {
       name,
       req.user.id,
       description,
-      averagePrive,
+      averagePrice,
       averageService,
       phoneNumber
     );
@@ -105,4 +106,16 @@ export const handleRestaurantSwipe = (req: Request, res: Response) => {
   if (!data) return res.status(500).json({ message: "Internal server error" });
 
   return res.status(201).json(data);
+};
+
+export const getLikeRestaurants = async (req: Request, res: Response) => {
+  if (!req.user) return res.status(400).json({ message: "User not found" });
+  try {
+    const restaurants = await restaurantServiceGetLike(req.user.id);
+
+    return res.status(200).json(restaurants);
+  } catch (error: unknown) {
+    console.error("Error during restaurant creation:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
 };

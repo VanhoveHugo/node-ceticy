@@ -12,6 +12,8 @@ import { config } from "../config";
 import { AuthLoginBody, AuthRegisterBody } from "../utils/interfacesRequest";
 import { customerServiceCreate, customerServiceFindByEmail } from "../services/customerService";
 import { managerServiceCreate, managerServiceFindByEmail } from "../services/managerService";
+import { friendServiceGetCount } from "../services/friendService";
+import { restaurantServiceGetCount } from "../services/restaurantService";
 
 export const authRegister = async (
   req: Request<object, object, AuthRegisterBody>,
@@ -191,6 +193,9 @@ export const authAccount = async (
     user = user[0];
     user.password = undefined;
     user.scope = decoded.scope;
+
+    user.currentFriendCount = await friendServiceGetCount(user.id);
+    user.currentLikeCount = await restaurantServiceGetCount(user.id);
 
     res.status(200).json(user);
   } catch (error: unknown) {

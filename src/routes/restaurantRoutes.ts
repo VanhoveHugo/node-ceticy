@@ -10,6 +10,7 @@ import {
   updateRestaurant,
   handleRestaurantSwipe,
   getRestaurantsByManagerId,
+  getLikeRestaurants,
 } from "../controllers/restaurantController";
 import upload from "../utils/configMulter";
 
@@ -65,6 +66,25 @@ restaurantRouter.get("/list", getListOfRestaurants);
  *         description: "{ kind: 'server_error', content: reason }"
  */
 restaurantRouter.post("/swipe", handleRestaurantSwipe);
+
+/**
+ * @swagger
+ * /restaurants/like:
+ *   get:
+ *     tags: [Restaurants]
+ *     summary: Get all restaurants liked by the user
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       201:
+ *         description: "{ restaurants }"
+ *       400:
+ *         description: "{ kind: error_code, content: invalid_field  }"
+ *       500:
+ *         description: "{ kind: 'server_error', content: reason }"
+ */
+restaurantRouter.get("/like", getLikeRestaurants);
+
 
 // Manager Only
 
@@ -156,7 +176,7 @@ restaurantRouter.post("/", upload.single("thumbnail"), addRestaurant);
  *               status:
  *                 type: string
  *                 format: string
- *                 example: "accepted"
+ *                 example: "accept"
  *     responses:
  *       201:
  *         description: "{ success }"

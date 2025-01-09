@@ -18,7 +18,7 @@ export interface FriendCreateBody {
 export interface RestaurantCreateBody {
   name: string;
   description: string;
-  averagePrive: number;
+  averagePrice: number;
   averageService: number;
   phoneNumber: string;
 }

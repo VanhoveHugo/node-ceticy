@@ -24,7 +24,7 @@ export const customerServiceFindByEmail = async (email: string) => {
   try {
     const res: any = await connection
       .promise()
-      .query("SELECT id, email, password FROM users WHERE email = ? LIMIT 1", [
+      .query("SELECT id, name, email, password FROM users WHERE email = ? LIMIT 1", [
         email,
       ]);
 

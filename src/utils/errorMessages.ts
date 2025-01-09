@@ -19,5 +19,9 @@ export const ERROR_MESSAGES = {
     kind: "access_denied",
     content: field,
   }),
+  contentLimit: (field: string) => ({
+    kind: "content_limit",
+    content: field,
+  }),
   serverError: (field: string) => ({ kind: "server_error", content: field }),
 };
