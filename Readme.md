@@ -1,14 +1,14 @@
-# API ceticy
+# Ceticy
+This API is built with Node.js and TypeScript, and provides RESTful endpoints under the supervision of SonarQube for continuous code quality analysis.
 
-An API for Ceticy App
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=VanhoveHugo_node-ceticy&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=VanhoveHugo_node-ceticy)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=VanhoveHugo_node-ceticy&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=VanhoveHugo_node-ceticy)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=VanhoveHugo_node-ceticy&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=VanhoveHugo_node-ceticy)
 
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/35865dc794cd4e138fb7edd422b0c5c0)](https://app.codacy.com/gh/VanhoveHugo/node-ceticy/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+## Installation
 
-## installation
-
-Run the API
 ```bash
-docker-compose up
+docker compose up
 ```
 
 ## Features
@@ -16,4 +16,9 @@ docker-compose up
 - [x] User Authentication
 - [x] Manager Authentication
 - [ ] Friend Management
-- [x] Restaurant Creation
+- [ ] Restaurant Management
+- [ ] Group Management
+- [ ] Poll Management
+
+## Authors
+- [Hugo Vanhove](https://www.linkedin.com/in/vanhovehugo/)
