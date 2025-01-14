@@ -18,8 +18,10 @@ services:
     build:
       context: .
     volumes:
-      - .:/usr/src/api
-      - /usr/src/api/node_modules
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - "3000:3000"
     depends_on:
       - db
       - traefik
@@ -62,5 +64,4 @@ services:
     ports:
       - "80:80"
       - "443:443"
-      - "8080:8080"
     restart: always
