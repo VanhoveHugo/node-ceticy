@@ -1,4 +1,4 @@
-import e, { Request, Response } from "express";
+import { Request, Response } from "express";
 import {
   restaurantServiceCreate,
   restaurantServiceGetByManagerId,
@@ -91,7 +91,7 @@ export const addRestaurant = async (req: Request, res: Response) => {
       let thumbnailId = await photoServiceCreate(restaurantId, file.path);
 
       if (!thumbnailId) {
-        return res.status(500).json(ERROR_MESSAGES.serverError);
+        return res.status(500).json(ERROR_MESSAGES.serverError("cloudinary"));
       }
     }
 
@@ -110,7 +110,7 @@ export const deleteRestaurant = (req: Request, res: Response) => {
   return res.status(400).json(ERROR_MESSAGES.notImplemented);
 };
 
-export const handleRestaurantSwipe = (req: Request, res: Response) => {
+export const handleRestaurantSwipe = async (req: Request, res: Response) => {
   const { action, restaurantId } = req.body;
 
   if (!req.user?.id)
@@ -126,7 +126,7 @@ export const handleRestaurantSwipe = (req: Request, res: Response) => {
     return res.status(400).json(ERROR_MESSAGES.contentInvalid("action"));
 
   try {
-    let data = restaurantServiceHandleSwipe(
+    let data = await restaurantServiceHandleSwipe(
       restaurantId,
       req.user.id,
       action == "like"

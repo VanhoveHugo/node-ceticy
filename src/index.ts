@@ -42,7 +42,7 @@ if (connection) {
 // Error-handling middleware without the unused next parameter
 app.use((err: Error, req: Request, res: Response, _: NextFunction) => {
   console.error(err.stack);
-  res.status(500).json(ERROR_MESSAGES.serverError);
+  res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
 });
 
 app.listen(3000);

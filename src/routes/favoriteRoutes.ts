@@ -11,7 +11,7 @@ const favoriteRouter = Router();
  * /restaurants/favorites:
  *   get:
  *     tags: [Restaurants]
- *     summary: User can favorite a restaurant
+ *     summary: User can get a list of their favorite restaurants
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -57,7 +57,7 @@ favoriteRouter.post("/", addFavoriteRestaurant);
  * /restaurants/favorites:
  *   delete:
  *     tags: [Restaurants]
- *     summary: User can favorite a restaurant
+ *     summary: User can unfavorite a restaurant
  *     security:
  *       - bearerAuth: []
  *     requestBody:

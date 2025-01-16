@@ -1,7 +1,5 @@
 import { Request, Response } from "express";
-import { validateField } from "../utils/validateField";
 import { ERROR_MESSAGES } from "../utils/errorMessages";
-import { validateNumber } from "../utils/validateData";
 import { customerServiceFindByEmail } from "../services/customerService";
 import {
   friendServiceCreate,

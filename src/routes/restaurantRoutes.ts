@@ -11,8 +11,6 @@ import {
   handleRestaurantSwipe,
   getRestaurantsByManagerId,
   getLikeRestaurants,
-  addFavoriteRestaurant,
-  deleteFavoriteRestaurant,
 } from "../controllers/restaurantController";
 import upload from "../utils/configMulter";
 import { favoriteRouter } from "./favoriteRoutes";

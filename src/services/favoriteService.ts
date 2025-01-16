@@ -15,7 +15,7 @@ export const favoriteServiceCreate = async (
 
     if (res[0].length === 0) return null;
     return res[0];
-  } catch (error: string | unknown) {
+  } catch (error: any) {
     console.error(error);
   }
 };
@@ -35,7 +35,7 @@ export const favoriteServiceDelete = async (
 
     if (res[0].length === 0) return null;
     return res[0];
-  } catch (error: string | unknown) {
+  } catch (error: any) {
     console.error(error);
   }
 };
@@ -47,8 +47,8 @@ export const favoriteServiceGet = async (userId: number) => {
       .promise()
       .query(`SELECT * FROM favorites WHERE userId = ?`, [userId]);
 
-      return res[0];
-  } catch (error: string | unknown) {
+    return res[0];
+  } catch (error: any) {
     console.error(error);
   }
 };
@@ -68,7 +68,7 @@ export const favoriteServiceGetOne = async (
 
     if (res[0].length === 0) return null;
     return res[0];
-  } catch (error: string | unknown) {
+  } catch (error: any) {
     console.error(error);
   }
 };
