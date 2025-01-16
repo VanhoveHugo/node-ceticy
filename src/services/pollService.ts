@@ -14,7 +14,7 @@ export const pollServiceCreate = async(name: string, creatorId: number) => {
     return res[0];
   }
   catch (error: string | unknown) {
-    console.error("Error during user registration:", error);
+    console.error(error);
   }
 }
 
@@ -33,7 +33,7 @@ export const pollServiceUpdate = async (pollId: number, name: string, creatorId:
     return res[0];
   }
   catch (error: string | unknown) {
-    console.error("Error during user registration:", error);
+    console.error(error);
   }
 }
 
@@ -51,7 +51,7 @@ export const pollServiceDelete = async (pollId: number, creatorId: number) => {
     return res[0];
   }
   catch (error: string | unknown) {
-    console.error("Error during user registration:", error);
+    console.error(error);
   }
 }
 
@@ -67,6 +67,6 @@ export const pollServiceCount = async (creatorId: number) => {
     return res[0].count;
   }
   catch (error: string | unknown) {
-    console.error("Error during user registration:", error);
+    console.error(error);
   }
 }

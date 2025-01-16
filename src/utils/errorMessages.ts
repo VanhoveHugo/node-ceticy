@@ -24,4 +24,8 @@ export const ERROR_MESSAGES = {
     content: field,
   }),
   serverError: (field: string) => ({ kind: "server_error", content: field }),
+  notImplemented: ({
+    kind: "not_implemented",
+    content: "feature",
+  }),
 };

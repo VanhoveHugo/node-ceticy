@@ -13,7 +13,7 @@ export const friendServiceCreate = async (userId1: number, userId2: number) => {
     if (res[0].length === 0) return null;
     return res[0];
   } catch (error: string | unknown) {
-    console.error("Error during user registration:", error);
+    console.error(error);
   }
 };
 
@@ -33,7 +33,7 @@ export const friendServiceFindByIds = async (
     if (res[0].length === 0) return null;
     return res[0];
   } catch (error: string | unknown) {
-    console.error("Error during user registration:", error);
+    console.error(error);
   }
 };
 
@@ -53,7 +53,7 @@ export const friendServiceHandleStatus = async(
     return res[0];
   }
   catch (error: string | unknown) {
-    console.error("Error during user registration:", error);
+    console.error(error);
   }
 }
 
@@ -69,6 +69,6 @@ export const friendServiceGetCount = async (userId: number) => {
 
     return res[0].count;
   } catch (error: string | unknown) {
-    console.error("Error during user registration:", error);
+    console.error(error);
   }
 }
