@@ -1,4 +1,4 @@
-# Ceticy
+# Ceticy API
 This API is built with Node.js and TypeScript, and provides RESTful endpoints under the supervision of SonarQube for continuous code quality analysis.
 
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=VanhoveHugo_node-ceticy&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=VanhoveHugo_node-ceticy)
@@ -13,12 +13,21 @@ docker compose up
 
 ## Features
 
-- [x] User Authentication
-- [x] Manager Authentication
+### Authentication
+- [x] User
+- [x] Manager
+
+### B2C
 - [ ] Friend Management
-- [ ] Restaurant Management
-- [ ] Group Management
+- [x] Favorite Restaurant
+- [ ] Restaurant Reviews
+- [ ] Restaurant Groups
 - [ ] Poll Management
+
+### B2B
+- [ ] Restaurant Management
+- [ ] Manager Analytics
+
 
 ## Authors
 - [Hugo Vanhove](https://www.linkedin.com/in/vanhovehugo/)

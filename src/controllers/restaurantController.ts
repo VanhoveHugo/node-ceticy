@@ -8,6 +8,13 @@ import {
 } from "../services/restaurantService";
 import { RestaurantCreateBody } from "../utils/interfacesRequest";
 import { photoServiceCreate } from "../services/photoService";
+import {
+  favoriteServiceCreate,
+  favoriteServiceDelete,
+  favoriteServiceGet,
+  favoriteServiceGetOne,
+} from "../services/favoriteService";
+import { ERROR_MESSAGES } from "../utils/errorMessages";
 
 declare module "express-serve-static-core" {
   interface Request {
@@ -20,27 +27,37 @@ declare module "express-serve-static-core" {
 }
 
 export const getListOfRestaurants = async (req: Request, res: Response) => {
+  if (!req.user?.id)
+    return res.status(400).json(ERROR_MESSAGES.contentInvalid("userId"));
+
   try {
-    if (!req.user) return res.status(400).json({ message: "User not found" });
-    // Get a list of restaurants
     const restaurants = await restaurantServiceGetList(req.user.id);
 
     return res.status(200).json(restaurants);
   } catch (error: unknown) {
     console.error("Error during restaurant creation:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
   }
 };
 
-export const getRestaurantsByManagerId = async (req: Request, res: Response) => {
-  if(!req.user) return res.status(400).json({ message: "User not found" });
-  let managerId = req.user.id;
-  if (!managerId) return res.status(400).json({ message: "Manager ID not found" });
+export const getRestaurantsByManagerId = async (
+  req: Request,
+  res: Response
+) => {
+  if (!req.user?.id)
+    return res.status(400).json(ERROR_MESSAGES.contentInvalid("userId"));
 
-  let data = await restaurantServiceGetByManagerId(managerId);
-  if (!data) return res.status(500).json({ message: "Internal server error" });
+  try {
+    let data = await restaurantServiceGetByManagerId(req.user.id);
 
-  return res.status(200).json(data);
+    if (!data)
+      return res.status(500).json(ERROR_MESSAGES.serverError("service"));
+
+    return res.status(200).json(data);
+  } catch (error: unknown) {
+    console.error("Error during restaurant manager retrieval:", error);
+    return res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
+  }
 };
 
 export const addRestaurant = async (req: Request, res: Response) => {
@@ -53,9 +70,8 @@ export const addRestaurant = async (req: Request, res: Response) => {
   }: RestaurantCreateBody = req.body;
   const file = req.file;
 
-  if (!req.user) {
-    return res.status(400).json({ message: "User not found" });
-  }
+  if (!req.user?.id)
+    return res.status(400).json(ERROR_MESSAGES.contentInvalid("userId"));
 
   try {
     // TODO: Handle Data Validation
@@ -71,51 +87,157 @@ export const addRestaurant = async (req: Request, res: Response) => {
       phoneNumber
     );
 
-    if(file) {
+    if (file) {
       let thumbnailId = await photoServiceCreate(restaurantId, file.path);
 
       if (!thumbnailId) {
-        return res.status(500).json({ message: "Internal server error" });
+        return res.status(500).json(ERROR_MESSAGES.serverError("cloudinary"));
       }
     }
 
     return res.status(201).json(restaurantId);
   } catch (error: unknown) {
     console.error("Error during restaurant creation:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
   }
 };
 
 export const updateRestaurant = (req: Request, res: Response) => {
-  return res.status(200).json({ message: "in progress" });
+  return res.status(400).json(ERROR_MESSAGES.notImplemented);
 };
 
 export const deleteRestaurant = (req: Request, res: Response) => {
-  return res.status(200).json({ message: "in progress" });
+  return res.status(400).json(ERROR_MESSAGES.notImplemented);
 };
 
-export const handleRestaurantSwipe = (req: Request, res: Response) => {
+export const handleRestaurantSwipe = async (req: Request, res: Response) => {
   const { action, restaurantId } = req.body;
 
-  if (!req.user) return res.status(400).json({ message: "User not found" });
+  if (!req.user?.id)
+    return res.status(400).json(ERROR_MESSAGES.contentInvalid("userId"));
 
-  if (!restaurantId) return res.status(400).json({ message: "Restaurant ID not found" });
+  if (req.user?.manager === true)
+    return res.status(400).json(ERROR_MESSAGES.accessDenied("unauthorized"));
 
-  let data = restaurantServiceHandleSwipe(restaurantId, req.user.id, action == "like");
+  if (!restaurantId)
+    return res.status(400).json(ERROR_MESSAGES.contentInvalid("restaurantId"));
 
-  if (!data) return res.status(500).json({ message: "Internal server error" });
+  if (!action)
+    return res.status(400).json(ERROR_MESSAGES.contentInvalid("action"));
 
-  return res.status(201).json(data);
+  try {
+    let data = await restaurantServiceHandleSwipe(
+      restaurantId,
+      req.user.id,
+      action == "like"
+    );
+
+    if (!data)
+      return res.status(500).json(ERROR_MESSAGES.serverError("service"));
+
+    return res.status(201).json(data);
+  } catch (error: unknown) {
+    console.error("Error during swipe handling:", error);
+    return res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
+  }
 };
 
 export const getLikeRestaurants = async (req: Request, res: Response) => {
-  if (!req.user) return res.status(400).json({ message: "User not found" });
+  if (!req.user?.id)
+    return res.status(400).json(ERROR_MESSAGES.contentInvalid("userId"));
+
   try {
     const restaurants = await restaurantServiceGetLike(req.user.id);
 
     return res.status(200).json(restaurants);
   } catch (error: unknown) {
     console.error("Error during restaurant creation:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
+  }
+};
+
+export const addFavoriteRestaurant = async (req: Request, res: Response) => {
+  const { restaurantId } = req.body;
+
+  if (!req.user?.id)
+    return res.status(400).json(ERROR_MESSAGES.contentInvalid("userId"));
+
+  if (req.user?.manager === true)
+    return res.status(400).json(ERROR_MESSAGES.accessDenied("unauthorized"));
+
+  if (!restaurantId)
+    return res.status(400).json(ERROR_MESSAGES.contentMissing("restaurantId"));
+
+  try {
+    let alreadyExists = await favoriteServiceGetOne(
+      req.user.id,
+      req.body.restaurantId
+    );
+
+    if (alreadyExists)
+      return res
+        .status(400)
+        .json(ERROR_MESSAGES.contentDuplicate("restaurantId"));
+
+    let data = await favoriteServiceCreate(req.user.id, req.body.restaurantId);
+
+    if (!data)
+      return res.status(500).json(ERROR_MESSAGES.serverError("service"));
+
+    return res.status(201).json(data);
+  } catch (error: unknown) {
+    console.error("Error during favorite restaurant creation:", error);
+    return res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
+  }
+};
+
+export const deleteFavoriteRestaurant = async (req: Request, res: Response) => {
+  const { restaurantId } = req.body;
+
+  if (!req.user?.id)
+    return res.status(400).json(ERROR_MESSAGES.contentInvalid("userId"));
+
+  if (req.user?.manager === true)
+    return res.status(400).json(ERROR_MESSAGES.accessDenied("unauthorized"));
+
+  if (!restaurantId) {
+    return res.status(400).json(ERROR_MESSAGES.contentInvalid("restaurantId"));
+  }
+
+  try {
+    let data = await favoriteServiceDelete(req.user.id, req.body.restaurantId);
+
+    if (!data)
+      return res.status(500).json(ERROR_MESSAGES.serverError("service"));
+
+    if (data.affectedRows === 0)
+      return res
+        .status(404)
+        .json(ERROR_MESSAGES.contentInvalid("restaurantId"));
+
+    return res.status(200).json(data);
+  } catch (error: unknown) {
+    console.error("Error during favorite restaurant deletion:", error);
+    return res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
+  }
+};
+
+export const getFavoriteRestaurants = async (req: Request, res: Response) => {
+  if (!req.user?.id)
+    return res.status(400).json(ERROR_MESSAGES.contentInvalid("userId"));
+
+  if (req.user?.manager === true)
+    return res.status(400).json(ERROR_MESSAGES.accessDenied("unauthorized"));
+
+  try {
+    let data = await favoriteServiceGet(req.user.id);
+
+    if (!data)
+      return res.status(500).json(ERROR_MESSAGES.serverError("service"));
+
+    return res.status(200).json(data);
+  } catch (error: unknown) {
+    console.error("Error during favorite restaurants retrieval:", error);
+    return res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
   }
 };
