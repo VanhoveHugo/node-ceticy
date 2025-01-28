@@ -12,6 +12,8 @@ services:
     ports:
       - "3306:3306"
     restart: always
+    networks:
+      - backend
 
   api:
     platform: linux/x86_64
@@ -35,17 +37,8 @@ services:
     environment:
       - NODE_ENV=production
     restart: always
-
-  pma:
-    image: phpmyadmin/phpmyadmin
-    environment:
-      PMA_HOST: db
-      PMA_PORT: 3306
-    ports:
-      - "3333:80"
-    depends_on:
-      - db
-    restart: always
+    networks:
+      - backend
 
   traefik:
     image: traefik:v2.10
@@ -65,3 +58,6 @@ services:
       - "80:80"
       - "443:443"
     restart: always
+
+networks:
+  backend:
