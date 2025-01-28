@@ -13,6 +13,7 @@ import {
   getLikeRestaurants,
 } from "../controllers/restaurantController";
 import upload from "../utils/configMulter";
+import { favoriteRouter } from "./favoriteRoutes";
 
 const restaurantRouter = Router();
 
@@ -23,7 +24,7 @@ restaurantRouter.use(authMiddleware);
  * /restaurants/list:
  *   get:
  *     tags: [Restaurants]
- *     summary: Get a selection of restaurants
+ *     summary: User can get a list of restaurants based on their preferences
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -41,7 +42,7 @@ restaurantRouter.get("/list", getListOfRestaurants);
  * /restaurants/swipe:
  *   post:
  *     tags: [Restaurants]
- *     summary: Handle a swipe on a restaurant
+ *     summary: User can swipe right or left on a restaurant
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -67,12 +68,14 @@ restaurantRouter.get("/list", getListOfRestaurants);
  */
 restaurantRouter.post("/swipe", handleRestaurantSwipe);
 
+restaurantRouter.use("/favorites", favoriteRouter);
+
 /**
  * @swagger
  * /restaurants/like:
  *   get:
  *     tags: [Restaurants]
- *     summary: Get all restaurants liked by the user
+ *     summary: User can get a list of liked restaurants
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -87,7 +90,6 @@ restaurantRouter.get("/like", getLikeRestaurants);
 
 
 // Manager Only
-
 restaurantRouter.use(managerMiddleware);
 
 /**
@@ -95,7 +97,7 @@ restaurantRouter.use(managerMiddleware);
  * /restaurants/:
  *   get:
  *     tags: [Restaurants]
- *     summary: Get all restaurants of a manager
+ *     summary: Manager can get all of their restaurants
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -113,7 +115,7 @@ restaurantRouter.get("/", getRestaurantsByManagerId);
  * /restaurants/:
  *   post:
  *     tags: [Restaurants]
- *     summary: Create a restaurant
+ *     summary: Manager can add a restaurant
  *     security:
  *       - bearerAuth: []
  *     requestBody:

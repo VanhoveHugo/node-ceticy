@@ -15,7 +15,7 @@ export const customerServiceCreate = async (
 
     return res[0].insertId;
   } catch (error: string | unknown) {
-    console.error("Error during user registration:", error);
+    console.error(error);
   }
 };
 
@@ -34,7 +34,7 @@ export const customerServiceFindByEmail = async (email: string) => {
 
     return res[0];
   } catch (error: string | unknown) {
-    console.error("Error during user registration:", error);
+    console.error(error);
   }
 };
 
@@ -47,6 +47,6 @@ export const customerServiceFindById = async (id: number) => {
 
     return res[0];
   } catch (error: string | unknown) {
-    console.error("Error during user registration:", error);
+    console.error(error);
   }
 };

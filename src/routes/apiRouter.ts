@@ -10,7 +10,6 @@ const router: Router = Router();
  * @swagger
  * tags:
  *   - name: Auth
- *     description: Authentication routes
  */
 router.use("/auth", authRouter);
 
@@ -18,7 +17,6 @@ router.use("/auth", authRouter);
  * @swagger
  * tags:
  *   - name: Friends
- *     description: Manage friends
  */
 router.use("/friends", friendsRouter);
 
@@ -26,7 +24,6 @@ router.use("/friends", friendsRouter);
  * @swagger
  * tags:
  *   - name: Restaurants
- *     description: Manage restaurants
  */
 router.use("/restaurants", restaurantRouter);
 
@@ -35,7 +32,6 @@ router.use("/restaurants", restaurantRouter);
  * @swagger
  * tags:
  *   - name: Polls
- *     description: Manage polls
  */
 router.use("/polls", pollRouter);
 
@@ -43,7 +39,6 @@ router.use("/polls", pollRouter);
  * @swagger
  * tags:
  *   - name: Todo
- *     description: Features come soon
  */
 
 router.get("/version", (req, res) => {

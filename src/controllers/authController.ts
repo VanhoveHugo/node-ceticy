@@ -70,7 +70,7 @@ export const authRegister = async (
 
     res.status(201).json({ email });
   } catch (error: unknown) {
-    console.error("Error during user registration:", error);
+    console.error(error);
 
     if (error instanceof Error) {
       if (error.message === "HashError") {

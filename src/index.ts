@@ -8,6 +8,7 @@ import swaggerUi from "swagger-ui-express";
 import { router } from "./routes/apiRouter";
 import { config } from "./config";
 import { connection } from "./utils/database";
+import { ERROR_MESSAGES } from "./utils/errorMessages";
 dotenv.config();
 
 const app: Express = express();
@@ -32,7 +33,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 if (connection) {
   app.use("/", router);
@@ -41,7 +42,7 @@ if (connection) {
 // Error-handling middleware without the unused next parameter
 app.use((err: Error, req: Request, res: Response, _: NextFunction) => {
   console.error(err.stack);
-  res.status(500).json({ message: "Internal Server Error" });
+  res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
 });
 
 app.listen(3000);
