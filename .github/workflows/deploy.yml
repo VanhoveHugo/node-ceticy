@@ -23,7 +23,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no root@192.162.69.37 << 'EOF'
           cd node-ceticy/
           git pull origin main
-          docker compose build api                # Rebuild uniquement le conteneur api si nécessaire
-          docker compose up -d --no-deps api      # Relance uniquement le conteneur api sans affecter ses dépendances
-          docker compose restart api              # Redémarre proprement le conteneur api
+          docker compose -f compose-prod.yml build api
+          docker compose -f compose-prod.yml up -d --no-deps api
+          docker compose -f compose-prod.yml restart api
           EOF
