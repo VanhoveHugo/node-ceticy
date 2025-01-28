@@ -35,17 +35,17 @@ export const authRegister = async (
       return res.status(400).json(ERROR_MESSAGES.contentInvalid("scope"));
     }
 
-    // let emailExists = null;
+    let emailExists = null;
 
-    // if (scope === "user") {
-    //   emailExists = await customerServiceFindByEmail(email);
-    // } else if (scope === "manager") {
-    //   emailExists = await managerServiceFindByEmail(email);
-    // }
+    if (scope === "user") {
+      emailExists = await customerServiceFindByEmail(email);
+    } else if (scope === "manager") {
+      emailExists = await managerServiceFindByEmail(email);
+    }
 
-    // if (emailExists) {
-    //   return res.status(409).json(ERROR_MESSAGES.contentDuplicate("email"));
-    // }
+    if (emailExists) {
+      return res.status(409).json(ERROR_MESSAGES.contentDuplicate("email"));
+    }
 
     // Hash the password
     const hash = await argon2.hash(password, {
