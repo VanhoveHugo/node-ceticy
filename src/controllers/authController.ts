@@ -35,30 +35,26 @@ export const authRegister = async (
       return res.status(400).json(ERROR_MESSAGES.contentInvalid("scope"));
     }
 
-    let emailExists = null;
+    // let emailExists = null;
 
-    if (scope === "user") {
-      // Check if the user already exists
-      emailExists = await customerServiceFindByEmail(email);
-    } else if (scope === "manager") {
-      // Check if the manager already exists
-      emailExists = await managerServiceFindByEmail(email);
-    }
+    // if (scope === "user") {
+    //   emailExists = await customerServiceFindByEmail(email);
+    // } else if (scope === "manager") {
+    //   emailExists = await managerServiceFindByEmail(email);
+    // }
 
-    if (emailExists) {
-      return res.status(409).json(ERROR_MESSAGES.contentDuplicate("email"));
-    }
+    // if (emailExists) {
+    //   return res.status(409).json(ERROR_MESSAGES.contentDuplicate("email"));
+    // }
 
     // Hash the password
-    const hash = await argon2.hash(password,
-      {
-        type: argon2.argon2id,
-        memoryCost: 2 ** 14,
-        timeCost: 2,
-        parallelism: 1,
-        hashLength: 32,
-      }
-    );
+    const hash = await argon2.hash(password, {
+      type: argon2.argon2id,
+      memoryCost: 2 ** 14,
+      timeCost: 2,
+      parallelism: 1,
+      hashLength: 32,
+    });
     if (!hash) throw new Error("HashError");
 
     // Create the user or manager
@@ -72,7 +68,7 @@ export const authRegister = async (
 
     if (!user) throw new Error("UserCreationError");
 
-    res.status(201).json({email});
+    res.status(201).json({ email });
   } catch (error: unknown) {
     console.error("Error during user registration:", error);
 
