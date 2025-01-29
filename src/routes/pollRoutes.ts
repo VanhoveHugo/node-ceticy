@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { authMiddleware } from "../middleware/authMiddleware";
-import { addPoll, deletePoll, getPolls, updatePoll } from "../controllers/pollController";
+import { addPoll, addPollParticipant, deletePoll, deletePollParticipant, getPolls, updatePoll } from "../controllers/pollController";
 
 const pollRouter = Router();
 
@@ -8,10 +8,10 @@ pollRouter.use(authMiddleware);
 
 /**
  * @swagger
- * /polls:
+ * /polls/:
  *   get:
  *     tags: [Todo]
- *     summary: Get all polls
+ *     summary: User can get their polls
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -26,10 +26,10 @@ pollRouter.get("/", getPolls);
 
 /**
  * @swagger
- * /polls:
+ * /polls/:
  *   post:
  *     tags: [Polls]
- *     summary: Get all polls
+ *     summary: User can create a poll
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -57,7 +57,7 @@ pollRouter.post("/", addPoll);
  * /polls/:
  *   put:
  *     tags: [Polls]
- *     summary: Update a poll
+ *     summary: User can update their poll
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -88,7 +88,7 @@ pollRouter.put("/", updatePoll);
  * /polls/:
  *   delete:
  *     tags: [Polls]
- *     summary: Delete a poll
+ *     summary: User can delete their poll
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -110,5 +110,67 @@ pollRouter.put("/", updatePoll);
  *         description: "{ kind: 'server_error', content: reason }"
  */
 pollRouter.delete("/", deletePoll);
+
+/**
+ * @swagger
+ * /polls/participants/:
+ *   post:
+ *     tags: [Polls]
+ *     summary: User can add a participant to their poll
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               pollId:
+ *                 type: string
+ *                 example: 1
+ *               participantId:
+ *                 type: string
+ *                 example: 2
+ *     responses:
+ *       201  :
+ *         description: "{ participantId }"
+ *       400:
+ *         description: "{ kind: error_code, content: invalid_field  }"
+ *       500:
+ *         description: "{ kind: 'server_error', content: reason }"
+ */
+pollRouter.post("/participants", addPollParticipant);
+
+/**
+ * @swagger
+ * /polls/participants/:
+ *   delete:
+ *     tags: [Polls]
+ *     summary: User can add a participant to their poll
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               pollId:
+ *                 type: string
+ *                 example: 1
+ *               participantId:
+ *                 type: string
+ *                 example: 2
+ *     responses:
+ *       201  :
+ *         description: "{ participantId }"
+ *       400:
+ *         description: "{ kind: error_code, content: invalid_field  }"
+ *       500:
+ *         description: "{ kind: 'server_error', content: reason }"
+ */
+pollRouter.delete("/participants", deletePollParticipant);
 
 export { pollRouter };

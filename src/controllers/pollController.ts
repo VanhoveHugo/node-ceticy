@@ -105,3 +105,11 @@ export const deletePoll = async (req: Request, res: Response) => {
     return res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
   }
 };
+
+export const addPollParticipant = async (req: Request, res: Response) => {
+  return res.status(400).json(ERROR_MESSAGES.notImplemented);
+}
+
+export const deletePollParticipant = async (req: Request, res: Response) => {
+  return res.status(400).json(ERROR_MESSAGES.notImplemented);
+}
