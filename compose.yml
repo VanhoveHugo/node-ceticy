@@ -14,7 +14,7 @@ services:
       - "3306:3306"
     restart: always
 
-  app:
+  api:
     build:
       context: .
     ports:
@@ -24,6 +24,8 @@ services:
       - /usr/src/app/node_modules
     depends_on:
       - db
+    environment:
+      - NODE_ENV=development
     restart: always
 
   pma:

@@ -65,12 +65,10 @@ export const getRestaurantsByManagerId = async (
     return res.status(400).json(ERROR_MESSAGES.contentInvalid("userId"));
 
   try {
-    console.log(req.user.id);
-    
-    // let data = await restaurantServiceGetByManagerId(req.user.id);
+    let data = await restaurantServiceGetByManagerId(req.user.id);
 
-    // if (!data)
-    //   return res.status(500).json(ERROR_MESSAGES.serverError("service"));
+    if (!data)
+      return res.status(500).json(ERROR_MESSAGES.serverError("service"));
 
     return res.status(200).json(req.user.id);
   } catch (error: unknown) {

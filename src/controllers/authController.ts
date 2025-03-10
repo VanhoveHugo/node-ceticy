@@ -8,7 +8,6 @@ import {
   validatePassword,
   validateName,
 } from "../utils/validateData";
-import { config } from "../config";
 import { AuthLoginBody, AuthRegisterBody } from "../utils/interfacesRequest";
 import { customerServiceCreate, customerServiceFindByEmail } from "../services/customerService";
 import { managerServiceCreate, managerServiceFindByEmail } from "../services/managerService";
@@ -126,14 +125,14 @@ export const authLogin = async (
     }
 
     // Check if the JWT secret is set
-    if (!config.JWT_SECRET) {
+    if (!process.env.JWT_SECRET) {
       throw new Error("MissingJWT");
     }
 
     // Create a JWT token
     const token = jwt.sign(
       { id: user.id, email: user.email, scope: scope },
-      config.JWT_SECRET
+      process.env.JWT_SECRET
     );
     if (!token) throw new Error("TokenError");
 
@@ -169,12 +168,12 @@ export const authAccount = async (
     }
 
     // Check if the JWT secret is set
-    if (!config.JWT_SECRET) {
+    if (!process.env.JWT_SECRET) {
       throw new Error("MissingJWT");
     }
 
     // Verify the JWT token
-    const decoded : any = jwt.verify(token, config.JWT_SECRET);
+    const decoded: any = jwt.verify(token, process.env.JWT_SECRET);
     if (!decoded) throw new Error("TokenError");
 
     // Find the user or manager
@@ -226,12 +225,12 @@ export const authDelete = async(
     }
 
     // Check if the JWT secret is set
-    if (!config.JWT_SECRET) {
+    if (!process.env.JWT_SECRET) {
       throw new Error("MissingJWT");
     }
 
     // Verify the JWT token
-    const decoded : any = jwt.verify(token, config.JWT_SECRET);
+    const decoded: any = jwt.verify(token, process.env.JWT_SECRET);
     if (!decoded) throw new Error("TokenError");
 
     // Find the user or manager

@@ -1,4 +1,4 @@
-import { connection } from "../utils/database";
+import { connection } from "../utils/configDatabase";
 
 export const customerServiceCreate = async (
   email: string,

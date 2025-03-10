@@ -1,4 +1,4 @@
-import { connection } from "../utils/database";
+import { connection } from "../utils/configDatabase";
 
 export const photoServiceCreate = async (restaurantId: number, url: string) => {
   if (!connection) return;
