@@ -16,7 +16,7 @@ friendsRouter.use(authMiddleware);
  * @swagger
  * /friends/:
  *   get:
- *     tags: [Todo]
+ *     tags: [Friends]
  *     summary: Get all friends of the user
  *     security:
  *       - bearerAuth: []

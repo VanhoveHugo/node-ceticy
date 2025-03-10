@@ -209,3 +209,60 @@ export const authAccount = async (
     res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
   }
 }
+
+export const authDelete = async(
+  req: Request<object, object>,
+  res: Response<object>
+) => {
+  const { email, password }: AuthLoginBody = req.body;
+
+  if(!req.headers.authorization) return res.status(400).json(ERROR_MESSAGES.contentInvalid("token"));
+  const token = req.headers.authorization.split(" ")[1];
+
+  try {
+    // Check if all required fields are present and valid
+    if (!validateField(token, (value: string) => typeof value === "string", "token", res)) {
+      return;
+    }
+
+    // Check if the JWT secret is set
+    if (!config.JWT_SECRET) {
+      throw new Error("MissingJWT");
+    }
+
+    // Verify the JWT token
+    const decoded : any = jwt.verify(token, config.JWT_SECRET);
+    if (!decoded) throw new Error("TokenError");
+
+    // Find the user or manager
+    let user = null;
+
+    if (decoded.scope === "user") {
+      user = await customerServiceFindByEmail(decoded.email);
+    } else if (decoded.scope === "manager") {
+      user = await managerServiceFindByEmail(decoded.email);
+    }
+
+    user = user[0];
+    user.password = undefined;
+    user.scope = decoded.scope;
+
+    user.currentFriendCount = await friendServiceGetCount(user.id);
+    user.currentLikeCount = await restaurantServiceGetCount(user.id);
+
+    res.status(200).json(user);
+  } catch (error: unknown) {
+    console.error("Error during account information:", error);
+
+    if (error instanceof Error) {
+      if (error.message === "MissingJWT") {
+        return res.status(500).json(ERROR_MESSAGES.serverError("jwt"));
+      }
+      if (error.message === "TokenError") {
+        return res.status(401).json(ERROR_MESSAGES.invalidCredentials("token"));
+      }
+    }
+
+    res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
+  }
+}

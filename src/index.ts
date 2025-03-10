@@ -1,4 +1,10 @@
-import express, { Express, Request, Response, NextFunction } from "express";
+import express, {
+  Express,
+  Request,
+  Response,
+  NextFunction,
+  RequestHandler,
+} from "express";
 import helmet from "helmet";
 import cors from "cors";
 import compression from "compression";
@@ -15,23 +21,28 @@ const app: Express = express();
 const swaggerDocs = swaggerJsDoc(config.SWAGGER_OPTIONS);
 
 // Middleware for parsing incoming requests
-app.use(express.urlencoded({ extended: true }) as express.RequestHandler);
-app.use(express.json() as express.RequestHandler);
+app.use(express.urlencoded({ extended: true }) as RequestHandler);
+app.use(express.json() as RequestHandler);
 
 // Security and configuration middlewares
 app.use(
   helmet({
     contentSecurityPolicy: config.NODE_ENV === "production" ? undefined : false,
     crossOriginEmbedderPolicy: false,
-  }) as express.RequestHandler
+  }) as RequestHandler
 );
-app.use(cors() as express.RequestHandler);
-app.use(compression() as express.RequestHandler);
+app.use(cors() as RequestHandler);
+app.use(compression() as RequestHandler);
 
-app.use((req, res, next) => {
-  console.info(`${req.method}:${req.originalUrl} ${JSON.stringify(req.body)}`);
-  next();
-});
+// Log requests in development mode
+if (config.NODE_ENV !== "production") {
+  app.use((req, res, next) => {
+    console.info(
+      `${req.method}:${req.originalUrl} ${JSON.stringify(req.body)}`
+    );
+    next();
+  });
+}
 
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 

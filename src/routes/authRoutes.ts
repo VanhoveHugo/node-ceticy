@@ -94,5 +94,20 @@ authRouter.post("/signin", authLogin);
  */
 authRouter.get("/account", authAccount);
 
+/**
+ * @swagger
+ * /auth/delete:
+ *   get:
+ *     tags: [Auth]
+ *     summary: Get route to delete account for PlayStore
+*     responses:
+ *       201:
+ *         description: "{ user or manager }"
+ *       400:
+ *         description: "{ kind: error_code, content: invalid_field  }"
+ *       500:
+ *         description: "{ kind: 'server_error', content: reason }"
+ */
+authRouter.get("/delete", authAccount);
 
 export { authRouter };

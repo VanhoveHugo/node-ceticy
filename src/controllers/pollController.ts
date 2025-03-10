@@ -1,10 +1,16 @@
 import { Request, Response } from "express";
 import { ERROR_MESSAGES } from "../utils/errorMessages";
 import {
-  pollServiceCount,
   pollServiceCreate,
   pollServiceDelete,
+  pollServiceCheckIsCreator,
   pollServiceUpdate,
+  pollServiceCheckIsValidParticipant,
+  pollServiceParticipantAdd,
+  pollServiceParticipantRemove,
+  pollServiceGetAll,
+  pollServiceRestaurantsAdd,
+  pollServiceVoteAdd,
 } from "../services/pollService";
 
 declare module "express-serve-static-core" {
@@ -18,7 +24,23 @@ declare module "express-serve-static-core" {
 }
 
 export const getPolls = async (req: Request, res: Response) => {
-  return res.status(400).json(ERROR_MESSAGES.notImplemented);
+  if (!req.user?.id)
+    return res.status(400).json(ERROR_MESSAGES.contentInvalid("userId"));
+
+  if (req.user?.manager === true)
+    return res.status(400).json(ERROR_MESSAGES.accessDenied("unauthorized"));
+
+  try {
+    const polls = await pollServiceGetAll(req.user.id);
+
+    if (!polls)
+      return res.status(500).json(ERROR_MESSAGES.serverError("service"));
+
+    return res.status(201).json(polls);
+  } catch (error: unknown) {
+    console.error("Error during poll creation:", error);
+    return res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
+  }
 };
 
 export const getPollById = async (req: Request, res: Response) => {
@@ -26,7 +48,7 @@ export const getPollById = async (req: Request, res: Response) => {
 };
 
 export const addPoll = async (req: Request, res: Response) => {
-  const { name } = req.body;
+  const { name, friendsList, restaurantsList } = req.body;
 
   if (!req.user?.id)
     return res.status(400).json(ERROR_MESSAGES.contentInvalid("userId"));
@@ -37,17 +59,31 @@ export const addPoll = async (req: Request, res: Response) => {
   if (!name) return res.status(400).json(ERROR_MESSAGES.contentInvalid("name"));
 
   try {
-    let pollCounter: number = await pollServiceCount(req.user.id);
+    // let pollCounter: number = await pollServiceCount(req.user.id);
 
-    if (pollCounter >= 5)
-      return res.status(400).json(ERROR_MESSAGES.contentLimit("polls"));
+    // if (pollCounter >= 5)
+    //   return res.status(400).json(ERROR_MESSAGES.contentLimit("polls"));
 
-    const poll = await pollServiceCreate(name, req.user.id);
+    const pollId = await pollServiceCreate(name, req.user.id);
 
-    if (!poll)
+    if (!pollId)
       return res.status(500).json(ERROR_MESSAGES.serverError("service"));
 
-    return res.status(201).json({ poll });
+    if (friendsList) {
+      if (!pollId)
+        return res.status(400).json(ERROR_MESSAGES.contentInvalid("pollId"));
+
+      friendsList.forEach(async (friend: number) => {
+        if (typeof req.user == "undefined") return;
+        await addPollParticipant(req.user.id, pollId, friend);
+      });
+
+      // V1 1 Restaurant per Poll
+      let restaurantId = restaurantsList;
+      await pollServiceRestaurantsAdd(pollId, restaurantId);
+    }
+
+    return res.status(201).json(pollId);
   } catch (error: unknown) {
     console.error("Error during poll creation:", error);
     return res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
@@ -106,10 +142,87 @@ export const deletePoll = async (req: Request, res: Response) => {
   }
 };
 
-export const addPollParticipant = async (req: Request, res: Response) => {
-  return res.status(400).json(ERROR_MESSAGES.notImplemented);
+const addPollParticipant = async (
+  userId: number,
+  pollId: number,
+  participantId: number
+) => {
+  try {
+    // if poll exist & user is the owner of the poll
+    let pollExist = await pollServiceCheckIsCreator(pollId, userId);
+
+    if (!pollExist) return;
+
+    // if participant exist
+    let participantExist = await pollServiceCheckIsValidParticipant(
+      participantId
+    );
+
+    if (!participantExist) return;
+
+    let data = await pollServiceParticipantAdd(pollId, participantId);
+
+    if (!data) return;
+
+    return true;
+  } catch (error: unknown) {
+    console.error("Error during adding poll participant:", error);
+    return error;
+  }
+};
+
+export const addPollVote = async (req: Request, res: Response) => {
+  const { pollId, userId, optionsList, vote } = req.body;
+
+  if (!req.user?.id)
+    return res.status(400).json(ERROR_MESSAGES.contentInvalid("userId"));
+
+  if (req.user?.manager === true)
+    return res.status(400).json(ERROR_MESSAGES.accessDenied("unauthorized"));
+
+  if (!pollId)
+    return res.status(400).json(ERROR_MESSAGES.contentInvalid("pollId"));
+
+  try {
+    let optionId = optionsList;
+    let data = await pollServiceVoteAdd(pollId, userId, optionId, vote);
+
+    if (!data) return;
+
+    return true;
+  } catch (error: unknown) {
+    console.error("Error during adding poll participant:", error);
+    return error;
+  }
 }
 
 export const deletePollParticipant = async (req: Request, res: Response) => {
-  return res.status(400).json(ERROR_MESSAGES.notImplemented);
-}
+  const { pollId, participantId } = req.body;
+
+  if (!req.user?.id)
+    return res.status(400).json(ERROR_MESSAGES.contentInvalid("userId"));
+
+  if (req.user.id == participantId)
+    return res.status(400).json(ERROR_MESSAGES.contentInvalid("participantId"));
+
+  if (req.user?.manager === true)
+    return res.status(400).json(ERROR_MESSAGES.accessDenied("unauthorized"));
+
+  if (!pollId)
+    return res.status(400).json(ERROR_MESSAGES.contentInvalid("pollId"));
+
+  if (!participantId)
+    return res.status(400).json(ERROR_MESSAGES.contentInvalid("participantId"));
+
+  try {
+    let data = await pollServiceParticipantRemove(pollId, participantId);
+
+    if (!data)
+      return res.status(400).json(ERROR_MESSAGES.contentMissing("participant"));
+
+    return res.status(200).json(participantId);
+  } catch (error: unknown) {
+    console.error("Error during removing poll participant:", error);
+    return res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
+  }
+};

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { authMiddleware } from "../middleware/authMiddleware";
-import { addPoll, addPollParticipant, deletePoll, deletePollParticipant, getPolls, updatePoll } from "../controllers/pollController";
+import { addPoll, addPollVote, deletePoll, deletePollParticipant, getPolls, updatePoll } from "../controllers/pollController";
 
 const pollRouter = Router();
 
@@ -10,7 +10,7 @@ pollRouter.use(authMiddleware);
  * @swagger
  * /polls/:
  *   get:
- *     tags: [Todo]
+ *     tags: [Polls]
  *     summary: User can get their polls
  *     security:
  *       - bearerAuth: []
@@ -113,10 +113,10 @@ pollRouter.delete("/", deletePoll);
 
 /**
  * @swagger
- * /polls/participants/:
- *   post:
+ * /polls/vote:
+ *   get:
  *     tags: [Polls]
- *     summary: User can add a participant to their poll
+ *     summary: User vote for a poll
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -127,20 +127,63 @@ pollRouter.delete("/", deletePoll);
  *             type: object
  *             properties:
  *               pollId:
- *                 type: string
+ *                 type: number
  *                 example: 1
- *               participantId:
- *                 type: string
- *                 example: 2
+ *               userId:
+ *                 type: number
+ *                 example: 1
+ *               optionsList:
+ *                 type: number
+ *                 example: 1
+ *               vote:
+ *                 type: boolean
+ *                 example: true
  *     responses:
- *       201  :
- *         description: "{ participantId }"
+ *       200  :
+ *         description: "{ pollId }"
  *       400:
  *         description: "{ kind: error_code, content: invalid_field  }"
  *       500:
  *         description: "{ kind: 'server_error', content: reason }"
  */
-pollRouter.post("/participants", addPollParticipant);
+pollRouter.get("/vote", addPollVote);
+
+/**
+ * @swagger
+ * /polls/vote:
+ *   post:
+ *     tags: [Polls]
+ *     summary: User vote for a poll
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               pollId:
+ *                 type: number
+ *                 example: 1
+ *               userId:
+ *                 type: number
+ *                 example: 1
+ *               optionsList:
+ *                 type: number
+ *                 example: 1
+ *               vote:
+ *                 type: boolean
+ *                 example: true
+ *     responses:
+ *       200  :
+ *         description: "{ pollId }"
+ *       400:
+ *         description: "{ kind: error_code, content: invalid_field  }"
+ *       500:
+ *         description: "{ kind: 'server_error', content: reason }"
+ */
+pollRouter.post("/vote", addPollVote);
 
 /**
  * @swagger

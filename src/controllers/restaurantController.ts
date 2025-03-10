@@ -5,6 +5,7 @@ import {
   restaurantServiceGetList,
   restaurantServiceGetLike,
   restaurantServiceHandleSwipe,
+  restaurantServiceGetById,
 } from "../services/restaurantService";
 import { RestaurantCreateBody } from "../utils/interfacesRequest";
 import { photoServiceCreate } from "../services/photoService";
@@ -40,6 +41,22 @@ export const getListOfRestaurants = async (req: Request, res: Response) => {
   }
 };
 
+export const getRestaurantById = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  if (!req.user?.id)
+    return res.status(400).json(ERROR_MESSAGES.contentInvalid("userId"));
+
+  try {
+    const restaurant = await restaurantServiceGetById(Number(id));
+
+    return res.status(200).json(restaurant);
+  } catch (error: unknown) {
+    console.error("Error during restaurant creation:", error);
+    return res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
+  }
+}
+
 export const getRestaurantsByManagerId = async (
   req: Request,
   res: Response
@@ -48,12 +65,14 @@ export const getRestaurantsByManagerId = async (
     return res.status(400).json(ERROR_MESSAGES.contentInvalid("userId"));
 
   try {
-    let data = await restaurantServiceGetByManagerId(req.user.id);
+    console.log(req.user.id);
+    
+    // let data = await restaurantServiceGetByManagerId(req.user.id);
 
-    if (!data)
-      return res.status(500).json(ERROR_MESSAGES.serverError("service"));
+    // if (!data)
+    //   return res.status(500).json(ERROR_MESSAGES.serverError("service"));
 
-    return res.status(200).json(data);
+    return res.status(200).json(req.user.id);
   } catch (error: unknown) {
     console.error("Error during restaurant manager retrieval:", error);
     return res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
@@ -86,6 +105,10 @@ export const addRestaurant = async (req: Request, res: Response) => {
       averageService,
       phoneNumber
     );
+
+    if (!restaurantId) {
+      return res.status(500).json(ERROR_MESSAGES.serverError("service"));
+    }
 
     if (file) {
       let thumbnailId = await photoServiceCreate(restaurantId, file.path);

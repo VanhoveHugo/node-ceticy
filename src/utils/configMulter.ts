@@ -1,7 +1,7 @@
 import multer from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import cloudinary from "./configCloudinary";
-const path = require("path");
+import path from "path";
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
@@ -12,8 +12,8 @@ const storage = new CloudinaryStorage({
       {
         width: 600,
         height: 800,
-        crop: "fill", // Ajuste l'image aux dimensions spécifiées
-        quality: "auto", // Optimisation automatique
+        crop: "fill",
+        quality: "auto",
       },
     ],
   }),
@@ -24,7 +24,7 @@ const upload = multer({
   fileFilter: (req, file, cb) => {
     // Types MIME acceptés : JPEG et PNG
     const validMimeTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-    const mimeType = validMimeTypes.includes(file.mimetype); // Vérification du type MIME
+    const mimeType = validMimeTypes.includes(file.mimetype);
 
     // Vérification de l'extension
     const extName = /jpeg|jpg|png/.test(path.extname(file.originalname).toLowerCase());
