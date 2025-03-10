@@ -4,6 +4,7 @@ import { customerServiceFindByEmail } from "../services/customerService";
 import {
   friendServiceCreate,
   friendServiceFindByIds,
+  friendServiceGetAll,
   friendServiceHandleStatus,
 } from "../services/friendService";
 
@@ -17,18 +18,31 @@ declare module "express-serve-static-core" {
   }
 }
 
-export const getFriends = (req: Request, res: Response) => {
-  return res.status(400).json(ERROR_MESSAGES.notImplemented);
+export const getFriends = async (req: Request, res: Response) => {
+  if (!req.user?.id)
+    return res.status(400).json(ERROR_MESSAGES.contentInvalid("userId"));
+
+  if (req.user?.manager === true)
+    return res.status(400).json(ERROR_MESSAGES.accessDenied("unauthorized"));
+
+  try {
+    const polls = await friendServiceGetAll(req.user.id);
+
+    if (!polls)
+      return res.status(500).json(ERROR_MESSAGES.serverError("service"));
+
+    return res.status(201).json(polls);
+  } catch (error: unknown) {
+    console.error("Error during poll creation:", error);
+    return res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
+  }
 };
 
 export const getFriendRequests = (req: Request, res: Response) => {
   return res.status(400).json(ERROR_MESSAGES.notImplemented);
 };
 
-export const addFriendRequest = async (
-  req: Request,
-  res: Response
-) => {
+export const addFriendRequest = async (req: Request, res: Response) => {
   const { email } = req.body;
 
   if (!req.user?.id)
@@ -43,14 +57,10 @@ export const addFriendRequest = async (
     let targerId = targetUser[0]?.id;
 
     if (!targetUser)
-      return res
-        .status(204)
-        .json(ERROR_MESSAGES.invalidCredentials("form"));
+      return res.status(204).json(ERROR_MESSAGES.invalidCredentials("form"));
 
     if (targerId === req.user.id)
-      return res
-        .status(400)
-        .json(ERROR_MESSAGES.contentInvalid("email"));
+      return res.status(400).json(ERROR_MESSAGES.contentInvalid("email"));
 
     const existingFriendRequest = await friendServiceFindByIds(
       req.user.id,
@@ -58,9 +68,7 @@ export const addFriendRequest = async (
     );
 
     if (existingFriendRequest)
-      return res
-        .status(400)
-        .json(ERROR_MESSAGES.contentDuplicate("email"));
+      return res.status(400).json(ERROR_MESSAGES.contentDuplicate("email"));
 
     const existingFriendRequestReverse = await friendServiceFindByIds(
       targerId,

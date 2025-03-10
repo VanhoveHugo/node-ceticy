@@ -1,6 +1,5 @@
 import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
-import { config } from "../config";
 import { ERROR_MESSAGES } from "../utils/errorMessages";
 
 declare module "express-serve-static-core" {
@@ -29,7 +28,7 @@ export const authMiddleware = (
 
   try {
     // Check if the JWT is valid
-    const decoded = jwt.verify(token, config.JWT_SECRET) as JwtPayload;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET ?? "") as JwtPayload;
 
     // Stock if the decoded JWT has an id
     req.user = {

@@ -1,4 +1,4 @@
-import { connection } from "../utils/database";
+import { connection } from "../utils/configDatabase";
 
 export const customerServiceCreate = async (
   email: string,
@@ -50,3 +50,16 @@ export const customerServiceFindById = async (id: number) => {
     console.error(error);
   }
 };
+
+export const customerServiceDelete = async (id: number) => {
+  if (!connection) return;
+  try {
+    const res = await connection
+      .promise()
+      .query(`DELETE FROM users WHERE id = ?`, [id]);
+
+    return res[0];
+  } catch (error: string | unknown) {
+    console.error(error);
+  }
+}

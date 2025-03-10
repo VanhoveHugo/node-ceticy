@@ -1,19 +1,19 @@
 import multer from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import cloudinary from "./configCloudinary";
-const path = require("path");
+import path from "path";
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: async (req: any, file: any) => ({
-    folder: "users",
+    folder: process.env.NODE_ENV,
     public_id: `${Date.now()}-${file.originalname}`,
     transformation: [
       {
         width: 600,
         height: 800,
-        crop: "fill", // Ajuste l'image aux dimensions spécifiées
-        quality: "auto", // Optimisation automatique
+        crop: "fill",
+        quality: "auto",
       },
     ],
   }),
@@ -22,18 +22,15 @@ const storage = new CloudinaryStorage({
 const upload = multer({
   storage: storage,
   fileFilter: (req, file, cb) => {
-    // Types MIME acceptés : JPEG et PNG
     const validMimeTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-    const mimeType = validMimeTypes.includes(file.mimetype); // Vérification du type MIME
+    const mimeType = validMimeTypes.includes(file.mimetype);
 
-    // Vérification de l'extension
     const extName = /jpeg|jpg|png/.test(path.extname(file.originalname).toLowerCase());
 
     if (mimeType && extName) {
       return cb(null, true);
     }
 
-    // Erreur si le type MIME ou l'extension ne correspondent pas
     cb(new Error("Le fichier '" + file.originalname + "' n'est pas un fichier image valide. Seuls les formats JPEG et PNG sont acceptés."));
   },
 });

@@ -2,8 +2,9 @@ version: '3.8'
 
 services:
   db:
-    platform: linux/x86_64
     image: mysql:5.7
+    volumes:
+      - db-data:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_NAME}
@@ -13,8 +14,7 @@ services:
       - "3306:3306"
     restart: always
 
-  app:
-    platform: linux/x86_64
+  api:
     build:
       context: .
     ports:
@@ -24,15 +24,17 @@ services:
       - /usr/src/app/node_modules
     depends_on:
       - db
+    environment:
+      - NODE_ENV=development
     restart: always
 
   pma:
     image: phpmyadmin/phpmyadmin
-    environment:
-      PMA_HOST: db
-      PMA_PORT: 3306
     ports:
       - "8080:80"
     depends_on:
       - db
     restart: always
+
+volumes:
+  db-data:

@@ -11,6 +11,7 @@ import {
   handleRestaurantSwipe,
   getRestaurantsByManagerId,
   getLikeRestaurants,
+  getRestaurantById,
 } from "../controllers/restaurantController";
 import upload from "../utils/configMulter";
 import { favoriteRouter } from "./favoriteRoutes";
@@ -88,13 +89,9 @@ restaurantRouter.use("/favorites", favoriteRouter);
  */
 restaurantRouter.get("/like", getLikeRestaurants);
 
-
-// Manager Only
-restaurantRouter.use(managerMiddleware);
-
 /**
  * @swagger
- * /restaurants/:
+ * /restaurants/{id}:
  *   get:
  *     tags: [Restaurants]
  *     summary: Manager can get all of their restaurants
@@ -108,7 +105,30 @@ restaurantRouter.use(managerMiddleware);
  *       500:
  *         description: "{ kind: 'server_error', content: reason }"
  */
-restaurantRouter.get("/", getRestaurantsByManagerId);
+restaurantRouter.get("/:id", getRestaurantById);
+
+// Manager Only
+restaurantRouter.use(managerMiddleware);
+
+/**
+ * @swagger
+ * /restaurants/manager:
+ *   get:
+ *     tags: [Restaurants]
+ *     summary: Manager can get all of their restaurants
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200  :
+ *         description: "{ list of restaurants }"
+ *       400:
+ *         description: "{ kind: error_code, content: invalid_field  }"
+ *       500:
+ *         description: "{ kind: 'server_error', content: reason }"
+ */
+restaurantRouter.get("/manager", (req, res) => {
+  res.status(200).json({ success: true });
+})
 
 /**
  * @swagger

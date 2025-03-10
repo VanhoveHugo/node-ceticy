@@ -1,4 +1,4 @@
-import { connection } from "../utils/database";
+import { connection } from "../utils/configDatabase";
 import { photoServiceGetByRestaurantId } from "./photoService";
 
 export const restaurantServiceCreate = async (
@@ -31,7 +31,8 @@ export const restaurantServiceGetList = async (customerId: number) => {
       `SELECT r.id, r.name, r.description, r.averagePrice, r.averageService, r.phoneNumber
         FROM restaurants r
         LEFT JOIN swipes s ON r.id = s.restaurantId AND s.userId = ?
-        WHERE s.userId IS NULL`,
+        WHERE s.userId IS NULL
+        LIMIT 20`,
       [customerId]
     );
 
@@ -133,6 +134,30 @@ export const restaurantServiceGetLike = async (customerId: number) => {
     );
 
     return data;
+  } catch (error: string | unknown) {
+    console.error("Error during restaurant creation:", error);
+  }
+};
+
+export const restaurantServiceGetById = async (restaurantId: number) => {
+  if (!connection) return;
+  try {
+    const res = await connection
+      .promise()
+      .query("SELECT * FROM restaurants WHERE id = ?", [restaurantId]);
+
+    let data: any = res[0];
+
+    if (Array.isArray(data) && data.length > 0) {
+      let restaurant = data[0];
+
+      const photos = await photoServiceGetByRestaurantId(restaurant.id);
+      restaurant = { ...restaurant, photos };
+
+      return restaurant;
+    }
+
+    return null;
   } catch (error: string | unknown) {
     console.error("Error during restaurant creation:", error);
   }
