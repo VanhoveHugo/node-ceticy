@@ -10,6 +10,8 @@ COPY package*.json ./
 # Installer toutes les dépendances, y compris les dépendances de développement
 RUN npm install
 
+RUN npm install -g ts-node-dev
+
 # Exposer le port
 EXPOSE 3000
 
