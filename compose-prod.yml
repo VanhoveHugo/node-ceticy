@@ -1,7 +1,7 @@
 services:
   db:
-    platform: linux/x86_64
     image: mysql:5.7
+    restart: always
     volumes:
       - db-data:/var/lib/mysql
     environment:
@@ -11,19 +11,16 @@ services:
       - .env
     ports:
       - "3306:3306"
-    restart: always
-    networks:
-      - backend
 
   api:
-    platform: linux/x86_64
-    build:
-      context: .
+    image: node:18
+    restart: always
+    working_dir: /usr/src/app
+    ports:
+      - "3000:3000"
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
-    ports:
-      - "3000:3000"
     depends_on:
       - db
       - traefik
@@ -36,9 +33,9 @@ services:
       - "traefik.http.routers.api.tls=true"
     environment:
       - NODE_ENV=production
-    restart: always
-    networks:
-      - backend
+    command: >
+      sh -c "npm install --production=false && npm run build && npm run start"
+
 
   traefik:
     image: traefik:v2.10
@@ -58,9 +55,6 @@ services:
       - "80:80"
       - "443:443"
     restart: always
-
-networks:
-  backend:
 
 volumes:
   db-data:

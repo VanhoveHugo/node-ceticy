@@ -1,4 +1,4 @@
-import express, { Express } from "express";
+import express, { Express, Request, Response, NextFunction } from "express";
 import helmet from "helmet";
 import cors from "cors";
 import compression from "compression";
@@ -34,7 +34,7 @@ app.use(compression());
 app.use(rateLimiter);
 
 // Log each request
-app.use((req, res, next) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
   logs.info(`Request: ${req.method} ${req.originalUrl}`);
   next();
 });
@@ -43,8 +43,8 @@ app.use((req, res, next) => {
 app.use(
   (
     err: { message: any; stack: any },
-    req: any,
-    res: any,
+    req: Request,
+    res: Response,
     next: (arg0: any) => void
   ) => {
     logs.error(`Error: ${err.message} - ${err.stack}`);
