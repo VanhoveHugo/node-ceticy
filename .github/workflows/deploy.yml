@@ -23,7 +23,8 @@ jobs:
           ssh -o StrictHostKeyChecking=no root@192.162.69.37 << 'EOF'
           cd node-ceticy/
           git pull origin main
+          npm ci
+          npx tsc
           docker compose -f compose-prod.yml build api
-          docker compose -f compose-prod.yml up -d --no-deps api
-          docker compose -f compose-prod.yml restart api
+          docker compose -f compose-prod.yml up -d --no-deps --remove-orphans api
           EOF
