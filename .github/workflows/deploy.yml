@@ -24,7 +24,6 @@ jobs:
           cd node-ceticy/
           git pull origin main
           npm ci
-          npx tsc
           docker compose -f compose-prod.yml build api
           docker compose -f compose-prod.yml up -d --no-deps --remove-orphans api
           EOF
