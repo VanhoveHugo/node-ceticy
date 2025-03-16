@@ -28,7 +28,7 @@ export const restaurantServiceGetList = async (customerId: number) => {
   if (!connection) return;
   try {
     const res = await connection.promise().query(
-      `SELECT r.id, r.name, r.description, r.averagePrice, r.averageService, r.phoneNumber
+      `SELECT r.id, r.name, r.description, r.averagePrice, r.averageService, r.phoneNumber, r.address
         FROM restaurants r
         LEFT JOIN swipes s ON r.id = s.restaurantId AND s.userId = ?
         WHERE s.userId IS NULL

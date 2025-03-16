@@ -46,9 +46,9 @@ router.get("/version", (req, res) => {
   res.json({ version: process.env.npm_package_version });
 });
 
-// Display the Swagger documentation in development
-if (process.env.NODE_ENV === "development") {
+// For the moment display the Swagger documentation in all environments
+// if (process.env.NODE_ENV === "development") {
   router.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-}
+// }
 
 export { router };
