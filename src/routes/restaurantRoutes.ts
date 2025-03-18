@@ -91,7 +91,7 @@ restaurantRouter.get("/like", getLikeRestaurants);
 
 /**
  * @swagger
- * /restaurants/{id}:
+ * /restaurants/one/{id}:
  *   get:
  *     tags: [Restaurants]
  *     summary: Manager can get all of their restaurants
@@ -105,7 +105,7 @@ restaurantRouter.get("/like", getLikeRestaurants);
  *       500:
  *         description: "{ kind: 'server_error', content: reason }"
  */
-restaurantRouter.get("/:id", getRestaurantById);
+restaurantRouter.get("/one/:id", getRestaurantById);
 
 // Manager Only
 restaurantRouter.use(managerMiddleware);
@@ -126,9 +126,7 @@ restaurantRouter.use(managerMiddleware);
  *       500:
  *         description: "{ kind: 'server_error', content: reason }"
  */
-restaurantRouter.get("/manager", (req, res) => {
-  res.status(200).json({ success: true });
-})
+restaurantRouter.get("/manager", getRestaurantsByManagerId);
 
 /**
  * @swagger
