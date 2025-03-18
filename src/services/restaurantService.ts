@@ -32,6 +32,7 @@ export const restaurantServiceGetList = async (customerId: number) => {
         FROM restaurants r
         LEFT JOIN swipes s ON r.id = s.restaurantId AND s.userId = ?
         WHERE s.userId IS NULL
+        ORDER BY r.id DESC
         LIMIT 20`,
       [customerId]
     );
