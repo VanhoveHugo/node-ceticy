@@ -46,6 +46,7 @@ export const restaurantServiceGetList = async (customerId: number) => {
       })
     );
 
+    if (data.length === 0) return [];
     return data;
   } catch (error: string | unknown) {
     console.error("Error during restaurant creation:", error);
@@ -68,6 +69,7 @@ export const restaurantServiceGetByManagerId = async (managerId: number) => {
       })
     );
 
+    if (data.length === 0) return [];
     return data;
   } catch (error: string | unknown) {
     console.error("Error during restaurant creation:", error);

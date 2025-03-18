@@ -70,7 +70,7 @@ export const getRestaurantsByManagerId = async (
     if (!data)
       return res.status(500).json(ERROR_MESSAGES.serverError("service"));
 
-    return res.status(200).json(req.user.id);
+    return res.status(200).json(data);
   } catch (error: unknown) {
     console.error("Error during restaurant manager retrieval:", error);
     return res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
