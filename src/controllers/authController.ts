@@ -9,8 +9,8 @@ import {
   validateName,
 } from "../utils/validateData";
 import { AuthLoginBody, AuthRegisterBody } from "../utils/interfacesRequest";
-import { customerServiceCreate, customerServiceFindByEmail } from "../services/customerService";
-import { managerServiceCreate, managerServiceFindByEmail } from "../services/managerService";
+import { customerServiceCreate, customerServiceDelete, customerServiceFindByEmail } from "../services/customerService";
+import { managerServiceCreate, managerServiceDelete, managerServiceFindByEmail } from "../services/managerService";
 import { friendServiceGetCount } from "../services/friendService";
 import { restaurantServiceGetCount } from "../services/restaurantService";
 
@@ -213,8 +213,6 @@ export const authDelete = async(
   req: Request<object, object>,
   res: Response<object>
 ) => {
-  const { email, password }: AuthLoginBody = req.body;
-
   if(!req.headers.authorization) return res.status(400).json(ERROR_MESSAGES.contentInvalid("token"));
   const token = req.headers.authorization.split(" ")[1];
 
@@ -243,13 +241,18 @@ export const authDelete = async(
     }
 
     user = user[0];
-    user.password = undefined;
-    user.scope = decoded.scope;
 
-    user.currentFriendCount = await friendServiceGetCount(user.id);
-    user.currentLikeCount = await restaurantServiceGetCount(user.id);
+    if (decoded.id !== user.id) {
+      return res.status(401).json(ERROR_MESSAGES.accessDenied("unauthorized"));
+    }
 
-    res.status(200).json(user);
+    if (decoded.scope === "user") {
+      await customerServiceDelete(user.id);
+    } else if (decoded.scope === "manager") {
+      await managerServiceDelete(user.id);
+    }
+
+    res.status(200).json(user.id);
   } catch (error: unknown) {
     console.error("Error during account information:", error);
 
