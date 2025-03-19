@@ -3,6 +3,7 @@ import {
   authLogin,
   authRegister,
   authAccount,
+  authDelete,
 } from "../controllers/authController";
 
 const authRouter: Router = Router();
@@ -108,6 +109,6 @@ authRouter.get("/account", authAccount);
  *       500:
  *         description: "{ kind: 'server_error', content: reason }"
  */
-authRouter.get("/delete", authAccount);
+authRouter.get("/delete", authDelete);
 
 export { authRouter };

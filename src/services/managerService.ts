@@ -51,3 +51,16 @@ export const managerServiceFindById = async (id: number) => {
     console.error("Error during manager registration:", error);
   }
 };
+
+export const managerServiceDelete = async (id: number) => {
+  if (!connection) return;
+  try {
+    const res = await connection
+      .promise()
+      .query(`DELETE FROM managers WHERE id = ?`, [id]);
+
+    return res[0];
+  } catch (error: string | unknown) {
+    console.error(error);
+  }
+};
