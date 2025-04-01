@@ -1,4 +1,7 @@
+import type { OpenAPIV3 } from "openapi-types";
 import swaggerJsDoc from "swagger-jsdoc";
+
+const isProd = process.env.NODE_ENV === "production";
 
 export const swaggerDocs = swaggerJsDoc({
   swaggerDefinition: {
@@ -14,14 +17,15 @@ export const swaggerDocs = swaggerJsDoc({
       },
     },
     servers: [
-      {
-        url: "http://localhost:3000",
-        description: "Development",
-      },
-      {
-        url: "https://api.ceticy.fr",
-        description: "Production",
-      },
+      isProd
+        ? {
+            url: "https://api.ceticy.fr",
+            description: "Production",
+          }
+        : {
+            url: "http://localhost:3000",
+            description: "Development",
+          },
     ],
     components: {
       securitySchemes: {
@@ -35,4 +39,4 @@ export const swaggerDocs = swaggerJsDoc({
     security: [{ bearerAuth: [] }],
   },
   apis: ["./src/routes/*.ts"],
-});
+}) as OpenAPIV3.Document;

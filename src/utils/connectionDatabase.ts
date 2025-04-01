@@ -1,6 +1,6 @@
 require("dotenv").config();
 import mysql, { Connection, QueryError } from "mysql2";
-import { configureLogger } from "./configLogger";
+import { configureLogger } from "./logger";
 
 const logs = configureLogger();
 let connection: Connection | null = null;
@@ -55,6 +55,8 @@ const keepAlive = () => {
   }, 30000);
 };
 
-connectWithRetry();
+if (process.env.NODE_ENV !== "test") {
+  connectWithRetry();
+}
 
 export { connection };

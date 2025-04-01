@@ -42,7 +42,6 @@ export const authMiddleware = (
 
     next();
   } catch (err) {
-    console.error("Token is not valid");
     return res.status(401).json(ERROR_MESSAGES.accessDenied("unauthorized"));
   }
 };

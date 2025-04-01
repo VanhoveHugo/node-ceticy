@@ -1,9 +1,6 @@
-import { connection } from "../utils/configDatabase";
+import { connection } from "../utils/connectionDatabase";
 
-export const managerServiceCreate = async (
-  email: string,
-  password: string
-) => {
+export const managerServiceCreate = async (email: string, password: string) => {
   if (!connection) return;
   try {
     const res: any = await connection
@@ -22,7 +19,7 @@ export const managerServiceCreate = async (
 export const managerServiceFindByEmail = async (email: string) => {
   if (!connection) return;
   try {
-    const res : any = await connection
+    const res: any = await connection
       .promise()
       .query(
         "SELECT id, email, password FROM managers WHERE email = ? LIMIT 1",
@@ -32,7 +29,7 @@ export const managerServiceFindByEmail = async (email: string) => {
     if (res[0].length === 0) {
       return null;
     }
-    
+
     return res[0];
   } catch (error: string | unknown) {
     console.error("Error during manager registration:", error);

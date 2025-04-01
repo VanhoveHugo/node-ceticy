@@ -2,7 +2,7 @@ import { Router } from "express";
 import {
   authMiddleware,
   managerMiddleware,
-} from "../middleware/authMiddleware";
+} from "../middlewares/authMiddleware";
 import {
   addRestaurant,
   deleteRestaurant,
@@ -13,7 +13,7 @@ import {
   getLikeRestaurants,
   getRestaurantById,
 } from "../controllers/restaurantController";
-import upload from "../utils/configMulter";
+import upload from "../utils/storage";
 import { favoriteRouter } from "./favoriteRoutes";
 
 const restaurantRouter = Router();

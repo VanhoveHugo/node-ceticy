@@ -36,7 +36,6 @@ export const getListOfRestaurants = async (req: Request, res: Response) => {
 
     return res.status(200).json(restaurants);
   } catch (error: unknown) {
-    console.error("Error during restaurant creation:", error);
     return res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
   }
 };
@@ -52,7 +51,6 @@ export const getRestaurantById = async (req: Request, res: Response) => {
 
     return res.status(200).json(restaurant);
   } catch (error: unknown) {
-    console.error("Error during restaurant creation:", error);
     return res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
   }
 }
@@ -72,7 +70,6 @@ export const getRestaurantsByManagerId = async (
 
     return res.status(200).json(data);
   } catch (error: unknown) {
-    console.error("Error during restaurant manager retrieval:", error);
     return res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
   }
 };
@@ -118,7 +115,6 @@ export const addRestaurant = async (req: Request, res: Response) => {
 
     return res.status(201).json(restaurantId);
   } catch (error: unknown) {
-    console.error("Error during restaurant creation:", error);
     return res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
   }
 };
@@ -158,7 +154,6 @@ export const handleRestaurantSwipe = async (req: Request, res: Response) => {
 
     return res.status(201).json(data);
   } catch (error: unknown) {
-    console.error("Error during swipe handling:", error);
     return res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
   }
 };
@@ -172,7 +167,6 @@ export const getLikeRestaurants = async (req: Request, res: Response) => {
 
     return res.status(200).json(restaurants);
   } catch (error: unknown) {
-    console.error("Error during restaurant creation:", error);
     return res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
   }
 };
@@ -207,7 +201,6 @@ export const addFavoriteRestaurant = async (req: Request, res: Response) => {
 
     return res.status(201).json(data);
   } catch (error: unknown) {
-    console.error("Error during favorite restaurant creation:", error);
     return res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
   }
 };
@@ -238,7 +231,6 @@ export const deleteFavoriteRestaurant = async (req: Request, res: Response) => {
 
     return res.status(200).json(data);
   } catch (error: unknown) {
-    console.error("Error during favorite restaurant deletion:", error);
     return res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
   }
 };
@@ -258,7 +250,6 @@ export const getFavoriteRestaurants = async (req: Request, res: Response) => {
 
     return res.status(200).json(data);
   } catch (error: unknown) {
-    console.error("Error during favorite restaurants retrieval:", error);
     return res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
   }
 };

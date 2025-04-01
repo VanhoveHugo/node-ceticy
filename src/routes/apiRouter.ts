@@ -4,7 +4,7 @@ import { authRouter } from "./authRoutes";
 import { friendsRouter } from "./friendRoutes";
 import { restaurantRouter } from "./restaurantRoutes";
 import { pollRouter } from "./pollRoutes";
-import { swaggerDocs } from "../utils/configSwagger";
+import { swaggerDocs } from "../utils/swagger";
 
 const router: Router = Router();
 

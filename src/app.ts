@@ -2,12 +2,11 @@ import express, { Express, Request, Response, NextFunction } from "express";
 import helmet from "helmet";
 import cors from "cors";
 import compression from "compression";
-import { configureLogger } from "./utils/configLogger";
-import { corsOptions } from "./middleware/corsMiddleware";
-import { rateLimiter } from "./middleware/rateLimiter";
-import { ERROR_MESSAGES } from "./utils/errorMessages";
+import { configureLogger } from "./utils/logger";
+import { corsOptions } from "./conf/cors";
+import { rateLimiter } from "./conf/limiter";
 import { router } from "./routes/apiRouter";
-import { connection } from "./utils/configDatabase";
+import { connection } from "./utils/connectionDatabase";
 
 const app: Express = express();
 const logs = configureLogger();
@@ -39,22 +38,15 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-// Log each error
-app.use(
-  (
-    err: { message: any; stack: any },
-    req: Request,
-    res: Response,
-    next: (arg0: any) => void
-  ) => {
-    logs.error(`Error: ${err.message} - ${err.stack}`);
-    res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
-  }
-);
-
 // If a database connection exists, use the router to handle requests
 if (connection) {
   app.use("/", router);
+}
+
+if (process.env.NODE_ENV === "test") {
+  app.get("/test", (req: Request, res: Response) => {
+    res.status(200).json({ message: "router" });
+  });
 }
 
 export { app };

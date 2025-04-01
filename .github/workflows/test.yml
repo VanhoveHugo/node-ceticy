@@ -20,6 +20,21 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Set test DB env
+        run: |
+          echo "DB_HOST=localhost" >> $GITHUB_ENV
+          echo "DB_USER=test" >> $GITHUB_ENV
+          echo "DB_PASSWORD=test" >> $GITHUB_ENV
+          echo "DB_NAME=testdb" >> $GITHUB_ENV
+
+      - name: Generate a coverage report
+        run: npm run coverage --if-present
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
       - name: Run TypeScript compiler
         run: npm run build --if-present
         env:

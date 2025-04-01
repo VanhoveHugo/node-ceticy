@@ -69,8 +69,6 @@ export const authRegister = async (
 
     res.status(201).json({ email });
   } catch (error: unknown) {
-    console.error(error);
-
     if (error instanceof Error) {
       if (error.message === "HashError") {
         return res.status(500).json(ERROR_MESSAGES.serverError("hash"));
@@ -138,8 +136,6 @@ export const authLogin = async (
 
     res.status(200).json({ token });
   } catch (error: unknown) {
-    console.error("Error during login:", error);
-
     if (error instanceof Error) {
       if (error.message === "MissingJWT") {
         return res.status(500).json(ERROR_MESSAGES.serverError("jwt"));
@@ -194,8 +190,6 @@ export const authAccount = async (
 
     res.status(200).json(user);
   } catch (error: unknown) {
-    console.error("Error during account information:", error);
-
     if (error instanceof Error) {
       if (error.message === "MissingJWT") {
         return res.status(500).json(ERROR_MESSAGES.serverError("jwt"));
@@ -213,13 +207,10 @@ export const authDelete = async(
   req: Request<object, object>,
   res: Response<object>
 ) => {
-  const { email, password }: AuthLoginBody = req.body;
-
   if(!req.headers.authorization) return res.status(400).json(ERROR_MESSAGES.contentInvalid("token"));
   const token = req.headers.authorization.split(" ")[1];
 
   try {
-    // Check if all required fields are present and valid
     if (!validateField(token, (value: string) => typeof value === "string", "token", res)) {
       return;
     }
@@ -251,8 +242,6 @@ export const authDelete = async(
 
     res.status(200).json(user);
   } catch (error: unknown) {
-    console.error("Error during account information:", error);
-
     if (error instanceof Error) {
       if (error.message === "MissingJWT") {
         return res.status(500).json(ERROR_MESSAGES.serverError("jwt"));
