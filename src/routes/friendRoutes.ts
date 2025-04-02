@@ -6,7 +6,7 @@ import {
   getFriends,
   updateFriendRequest,
 } from "../controllers/friendController";
-import { authMiddleware } from "../middleware/authMiddleware";
+import { authMiddleware } from "../middlewares/authMiddleware";
 
 const friendsRouter = Router();
 

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { authMiddleware } from "../middleware/authMiddleware";
+import { authMiddleware } from "../middlewares/authMiddleware";
 import { addPoll, addPollVote, deletePoll, deletePollParticipant, getPolls, updatePoll } from "../controllers/pollController";
 
 const pollRouter = Router();

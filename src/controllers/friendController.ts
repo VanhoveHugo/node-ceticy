@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import e, { Request, Response } from "express";
 import { ERROR_MESSAGES } from "../utils/errorMessages";
 import { customerServiceFindByEmail } from "../services/customerService";
 import {
@@ -33,7 +33,6 @@ export const getFriends = async (req: Request, res: Response) => {
 
     return res.status(201).json(polls);
   } catch (error: unknown) {
-    console.error("Error during poll creation:", error);
     return res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
   }
 };
@@ -44,6 +43,10 @@ export const getFriendRequests = (req: Request, res: Response) => {
 
 export const addFriendRequest = async (req: Request, res: Response) => {
   const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json(ERROR_MESSAGES.contentInvalid("email"));
+  }
 
   if (!req.user?.id)
     return res.status(400).json(ERROR_MESSAGES.contentInvalid("userId"));
@@ -82,18 +85,18 @@ export const addFriendRequest = async (req: Request, res: Response) => {
         "accept"
       );
 
-      if (!friendRequest) throw new Error("Friend request not accepted");
+      if (!friendRequest) return res.status(400).json(ERROR_MESSAGES.contentInvalid("email"));
 
       return res.status(201).json(friendRequest);
     }
 
     const friendRequest = await friendServiceCreate(req.user.id, targerId);
 
-    if (!friendRequest) throw new Error("Friend request not created");
+    if (!friendRequest) 
+      return res.status(400).json(ERROR_MESSAGES.contentInvalid("email"));
 
     return res.status(201).json(friendRequest);
   } catch (error) {
-    console.error("Error during friend request creation:", error);
     res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
   }
 };

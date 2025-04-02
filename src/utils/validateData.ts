@@ -19,5 +19,6 @@ export const validateName = (name: string): boolean => {
 }
 
 export const validateNumber = (number: string): boolean => {
+  if (!number.trim()) return false;
   return !isNaN(Number(number));
 }

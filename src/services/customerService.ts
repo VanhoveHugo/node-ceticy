@@ -1,4 +1,4 @@
-import { connection } from "../utils/configDatabase";
+import { connection } from "../utils/connectionDatabase";
 
 export const customerServiceCreate = async (
   email: string,
@@ -24,9 +24,10 @@ export const customerServiceFindByEmail = async (email: string) => {
   try {
     const res: any = await connection
       .promise()
-      .query("SELECT id, name, email, password FROM users WHERE email = ? LIMIT 1", [
-        email,
-      ]);
+      .query(
+        "SELECT id, name, email, password FROM users WHERE email = ? LIMIT 1",
+        [email]
+      );
 
     if (res[0].length === 0) {
       return null;
@@ -62,4 +63,4 @@ export const customerServiceDelete = async (id: number) => {
   } catch (error: string | unknown) {
     console.error(error);
   }
-}
+};

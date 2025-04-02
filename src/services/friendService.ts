@@ -1,12 +1,14 @@
-import { connection } from "../utils/configDatabase";
+import { connection } from "../utils/connectionDatabase";
 
 export const friendServiceGetAll = async (userId: number) => {
   if (!connection) return;
   try {
-    const [res]: any = await connection.promise().query(
-      `SELECT u.id, u.email FROM friends f JOIN users u ON (f.user1Id = u.id AND f.user2Id = ?) OR (f.user2Id = u.id AND f.user1Id = ?) WHERE f.status = 'accept';`,
-      [userId, userId]
-    );
+    const [res]: any = await connection
+      .promise()
+      .query(
+        `SELECT u.id, u.email FROM friends f JOIN users u ON (f.user1Id = u.id AND f.user2Id = ?) OR (f.user2Id = u.id AND f.user1Id = ?) WHERE f.status = 'accept';`,
+        [userId, userId]
+      );
 
     return res;
   } catch (error: string | unknown) {

@@ -1,4 +1,4 @@
-import { connection } from "../utils/configDatabase";
+import { connection } from "../utils/connectionDatabase";
 
 export const pollServiceGetAll = async (creatorId: number) => {
   if (!connection) return;

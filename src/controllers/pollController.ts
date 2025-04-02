@@ -11,7 +11,8 @@ import {
   pollServiceGetAll,
   pollServiceRestaurantsAdd,
   pollServiceVoteAdd,
-} from "../services/pollService";
+  pollServiceCount,
+} from "@/services/pollService";
 
 declare module "express-serve-static-core" {
   interface Request {
@@ -38,7 +39,6 @@ export const getPolls = async (req: Request, res: Response) => {
 
     return res.status(201).json(polls);
   } catch (error: unknown) {
-    console.error("Error during poll creation:", error);
     return res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
   }
 };
@@ -59,10 +59,10 @@ export const addPoll = async (req: Request, res: Response) => {
   if (!name) return res.status(400).json(ERROR_MESSAGES.contentInvalid("name"));
 
   try {
-    // let pollCounter: number = await pollServiceCount(req.user.id);
+    let pollCounter: number = await pollServiceCount(req.user.id);
 
-    // if (pollCounter >= 5)
-    //   return res.status(400).json(ERROR_MESSAGES.contentLimit("polls"));
+    if (pollCounter >= 5)
+      return res.status(400).json(ERROR_MESSAGES.contentLimit("polls"));
 
     const pollId = await pollServiceCreate(name, req.user.id);
 
@@ -85,7 +85,6 @@ export const addPoll = async (req: Request, res: Response) => {
 
     return res.status(201).json(pollId);
   } catch (error: unknown) {
-    console.error("Error during poll creation:", error);
     return res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
   }
 };
@@ -112,7 +111,6 @@ export const updatePoll = async (req: Request, res: Response) => {
 
     return res.status(200).json({ poll });
   } catch (error: unknown) {
-    console.error("Error during poll update:", error);
     return res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
   }
 };
@@ -137,7 +135,6 @@ export const deletePoll = async (req: Request, res: Response) => {
 
     return res.status(200).json({ poll });
   } catch (error: unknown) {
-    console.error("Error during poll deletion:", error);
     return res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
   }
 };

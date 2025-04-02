@@ -1,4 +1,4 @@
-import { connection } from "../utils/configDatabase";
+import { connection } from "../utils/connectionDatabase";
 import { photoServiceGetByRestaurantId } from "./photoService";
 
 export const restaurantServiceCreate = async (
