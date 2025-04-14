@@ -12,7 +12,7 @@ import {
   pollServiceRestaurantsAdd,
   pollServiceVoteAdd,
   pollServiceCount,
-} from "@/services/pollService";
+} from "../services/pollService";
 
 declare module "express-serve-static-core" {
   interface Request {

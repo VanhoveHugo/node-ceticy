@@ -42,6 +42,12 @@ pollRouter.get("/", getPolls);
  *               name:
  *                 type: string
  *                 example: Romantique
+ *               restaurantsList:
+ *                 type: string
+ *                 example: 1
+ *               friendsList:
+ *                 type: array
+ *                 example: ["option1", "option2"]
  *     responses:
  *       201  :
  *         description: "{ pollId }"
