@@ -34,7 +34,15 @@ app.use(rateLimiter);
 
 // Log each request
 app.use((req: Request, res: Response, next: NextFunction) => {
-  logs.info(`Request: ${req.method} ${req.originalUrl}`);
+  const now = new Date();
+  const formattedDate = now.toLocaleDateString("fr-FR");
+  const formattedTime = now.toLocaleTimeString("fr-FR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  logs.info(
+    `Request: [${formattedDate} à ${formattedTime}] ${req.method} ${req.originalUrl}`
+  );
   next();
 });
 
