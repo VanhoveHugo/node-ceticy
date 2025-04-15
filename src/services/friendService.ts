@@ -88,3 +88,36 @@ export const friendServiceGetCount = async (userId: number) => {
     console.error(error);
   }
 };
+
+export const friendServiceGetPendingRequests = async (userId: number) => {
+  if (!connection) return;
+  try {
+    const [res]: any = await connection
+      .promise()
+      .query(
+        `SELECT f.id, u.id as userId, u.email
+         FROM friends f
+         JOIN users u ON f.user1Id = u.id
+         WHERE f.user2Id = ? AND f.status = 'pending'`,
+        [userId]
+      );
+
+    return res;
+  } catch (error: string | unknown) {
+    console.error(error);
+  }
+};
+
+export const friendServiceDeleteRequest = async (requestId: number) => {
+  if (!connection) return;
+  try {
+    const res: any = await connection
+      .promise()
+      .query(`DELETE FROM friends WHERE id = ?`, [requestId]);
+
+    if (res[0].affectedRows === 0) return null;
+    return res[0];
+  } catch (error: string | unknown) {
+    console.error(error);
+  }
+};

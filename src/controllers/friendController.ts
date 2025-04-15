@@ -6,6 +6,8 @@ import {
   friendServiceFindByIds,
   friendServiceGetAll,
   friendServiceHandleStatus,
+  friendServiceGetPendingRequests,
+  friendServiceDeleteRequest,
 } from "../services/friendService";
 
 declare module "express-serve-static-core" {
@@ -37,8 +39,23 @@ export const getFriends = async (req: Request, res: Response) => {
   }
 };
 
-export const getFriendRequests = (req: Request, res: Response) => {
-  return res.status(400).json(ERROR_MESSAGES.notImplemented);
+export const getFriendRequests = async (req: Request, res: Response) => {
+  if (!req.user?.id)
+    return res.status(400).json(ERROR_MESSAGES.contentInvalid("userId"));
+
+  if (req.user?.manager === true)
+    return res.status(400).json(ERROR_MESSAGES.accessDenied("unauthorized"));
+
+  try {
+    const requests = await friendServiceGetPendingRequests(req.user.id);
+
+    if (!requests)
+      return res.status(500).json(ERROR_MESSAGES.serverError("service"));
+
+    return res.status(200).json(requests);
+  } catch (error: unknown) {
+    return res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
+  }
 };
 
 export const addFriendRequest = async (req: Request, res: Response) => {
@@ -101,10 +118,50 @@ export const addFriendRequest = async (req: Request, res: Response) => {
   }
 };
 
-export const updateFriendRequest = (req: Request, res: Response) => {
-  return res.status(400).json(ERROR_MESSAGES.notImplemented);
+export const updateFriendRequest = async (req: Request, res: Response) => {
+  const { requestId, status } = req.body;
+
+  if (!requestId || !status)
+    return res.status(400).json(ERROR_MESSAGES.contentInvalid("requestId or status"));
+
+  if (!req.user?.id)
+    return res.status(400).json(ERROR_MESSAGES.contentInvalid("userId"));
+
+  if (req.user?.manager === true)
+    return res.status(400).json(ERROR_MESSAGES.accessDenied("unauthorized"));
+
+  try {
+    const friendRequest = await friendServiceHandleStatus(Number(requestId), status);
+
+    if (!friendRequest)
+      return res.status(400).json(ERROR_MESSAGES.contentInvalid("requestId"));
+
+    return res.status(200).json(friendRequest);
+  } catch (error: unknown) {
+    return res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
+  }
 };
 
-export const deleteFriendRequest = (req: Request, res: Response) => {
-  return res.status(400).json(ERROR_MESSAGES.notImplemented);
+export const deleteFriendRequest = async (req: Request, res: Response) => {
+  const { requestId } = req.body;
+
+  if (!requestId)
+    return res.status(400).json(ERROR_MESSAGES.contentInvalid("requestId"));
+
+  if (!req.user?.id)
+    return res.status(400).json(ERROR_MESSAGES.contentInvalid("userId"));
+
+  if (req.user?.manager === true)
+    return res.status(400).json(ERROR_MESSAGES.accessDenied("unauthorized"));
+
+  try {
+    const result = await friendServiceDeleteRequest(Number(requestId));
+
+    if (!result)
+      return res.status(400).json(ERROR_MESSAGES.contentInvalid("requestId"));
+
+    return res.status(200).json({ message: "Friend request deleted successfully" });
+  } catch (error: unknown) {
+    return res.status(500).json(ERROR_MESSAGES.serverError("unknown"));
+  }
 };

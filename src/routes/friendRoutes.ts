@@ -34,7 +34,7 @@ friendsRouter.get("/", getFriends);
  * @swagger
  * /friends/requests/:
  *   get:
- *     tags: [Todo]
+ *     tags: [Friends]
  *     summary: Get friends requests of the user
  *     security:
  *       - bearerAuth: []
@@ -80,7 +80,7 @@ friendsRouter.post("/", addFriendRequest);
  * @swagger
  * /friends/:
  *   put:
- *     tags: [Todo]
+ *     tags: [Friends]
  *     summary: Update a friend request (accept or refuse)
  *     security:
  *       - bearerAuth: []
@@ -113,7 +113,7 @@ friendsRouter.put("/", updateFriendRequest);
  * @swagger
  * /friends/:
  *   delete:
- *     tags: [Todo]
+ *     tags: [Friends]
  *     summary: Delete a friend request
  *     security:
  *       - bearerAuth: []

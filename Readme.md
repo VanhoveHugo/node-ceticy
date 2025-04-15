@@ -19,11 +19,11 @@ docker compose up
 - [x] Manager
 
 ### B2C
-- [ ] Friend Management
+- [x] Friend Management
 - [x] Favorite Restaurant
 - [ ] Restaurant Reviews
 - [ ] Restaurant Groups
-- [ ] Poll Management
+- [x] Poll Management
 
 ### B2B
 - [ ] Restaurant Management
