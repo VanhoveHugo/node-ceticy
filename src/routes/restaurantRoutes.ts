@@ -29,12 +29,12 @@ restaurantRouter.use(authMiddleware);
  *     security:
  *       - bearerAuth: []
  *     responses:
- *       200  :
- *         description: "{ list of restaurants }"
+ *       200:
+ *         description: Returns a list of restaurants the user hasn't swiped yet
  *       400:
- *         description: "{ kind: error_code, content: invalid_field  }"
+ *         description: Missing or invalid userId
  *       500:
- *         description: "{ kind: 'server_error', content: reason }"
+ *         description: Server error
  */
 restaurantRouter.get("/list", getListOfRestaurants);
 
@@ -52,20 +52,24 @@ restaurantRouter.get("/list", getListOfRestaurants);
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - action
+ *               - restaurantId
  *             properties:
  *               action:
  *                 type: string
+ *                 enum: [like, dislike]
  *                 example: like
  *               restaurantId:
- *                 type: string
+ *                 type: number
  *                 example: 10
  *     responses:
  *       201:
- *         description: "{ success }"
+ *         description: Swipe registered
  *       400:
- *         description: "{ kind: error_code, content: invalid_field  }"
+ *         description: Missing or invalid fields
  *       500:
- *         description: "{ kind: 'server_error', content: reason }"
+ *         description: Server error
  */
 restaurantRouter.post("/swipe", handleRestaurantSwipe);
 
@@ -80,12 +84,12 @@ restaurantRouter.use("/favorites", favoriteRouter);
  *     security:
  *       - bearerAuth: []
  *     responses:
- *       201:
- *         description: "{ restaurants }"
+ *       200:
+ *         description: Returns liked restaurants
  *       400:
- *         description: "{ kind: error_code, content: invalid_field  }"
+ *         description: Invalid user
  *       500:
- *         description: "{ kind: 'server_error', content: reason }"
+ *         description: Server error
  */
 restaurantRouter.get("/like", getLikeRestaurants);
 
@@ -94,20 +98,25 @@ restaurantRouter.get("/like", getLikeRestaurants);
  * /restaurants/one/{id}:
  *   get:
  *     tags: [Restaurants]
- *     summary: Manager can get all of their restaurants
+ *     summary: Get one restaurant by its ID
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: number
  *     responses:
- *       200  :
- *         description: "{ list of restaurants }"
+ *       200:
+ *         description: Returns a restaurant
  *       400:
- *         description: "{ kind: error_code, content: invalid_field  }"
+ *         description: Invalid user or ID
  *       500:
- *         description: "{ kind: 'server_error', content: reason }"
+ *         description: Server error
  */
 restaurantRouter.get("/one/:id", getRestaurantById);
 
-// Manager Only
 restaurantRouter.use(managerMiddleware);
 
 /**
@@ -119,18 +128,18 @@ restaurantRouter.use(managerMiddleware);
  *     security:
  *       - bearerAuth: []
  *     responses:
- *       200  :
- *         description: "{ list of restaurants }"
+ *       200:
+ *         description: List of restaurants managed by the user
  *       400:
- *         description: "{ kind: error_code, content: invalid_field  }"
+ *         description: Invalid user
  *       500:
- *         description: "{ kind: 'server_error', content: reason }"
+ *         description: Server error
  */
 restaurantRouter.get("/manager", getRestaurantsByManagerId);
 
 /**
  * @swagger
- * /restaurants/:
+ * /restaurants:
  *   post:
  *     tags: [Restaurants]
  *     summary: Manager can add a restaurant
@@ -142,98 +151,111 @@ restaurantRouter.get("/manager", getRestaurantsByManagerId);
  *         multipart/form-data:
  *           schema:
  *             type: object
+ *             required:
+ *               - name
  *             properties:
  *               name:
  *                 type: string
  *                 example: Pirate Burger
  *               description:
  *                 type: string
- *                 example: "description"
+ *                 example: "Gros burgers et frites maison"
  *               averagePrice:
  *                 type: number
- *                 format: number
  *                 example: 2
  *               averageService:
  *                 type: number
- *                 format: number
  *                 example: 1
  *               phoneNumber:
- *                 type: number
- *                 format: number
+ *                 type: string
  *                 example: "0612345678"
  *               thumbnail:
  *                 type: string
  *                 format: binary
  *     responses:
  *       201:
- *         description: "{ restaurantId }"
+ *         description: Restaurant created
  *       400:
- *         description: "{ kind: error_code, content: invalid_field  }"
+ *         description: Invalid input
  *       500:
- *         description: "{ kind: 'server_error', content: reason }"
+ *         description: Server error
  */
 restaurantRouter.post("/", upload.single("thumbnail"), addRestaurant);
 
 /**
  * @swagger
- * /restaurants/:
+ * /restaurants/{id}:
  *   put:
- *     tags: [Todo]
- *     summary: Manager can update their restaurant
+ *     tags: [Restaurants]
+ *     summary: Manager can update one of their restaurants (image optional)
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: number
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
- *               requestId:
- *                 type: number
- *                 format: number
- *                 example: 1
- *               status:
+ *               name:
  *                 type: string
- *                 format: string
- *                 example: "accept"
+ *                 example: Pirate Burger Deluxe
+ *               description:
+ *                 type: string
+ *                 example: "Nouvelle version avec plus de bacon"
+ *               averagePrice:
+ *                 type: number
+ *               averageService:
+ *                 type: number
+ *               phoneNumber:
+ *                 type: string
+ *               address:
+ *                 type: string
+ *               thumbnail:
+ *                 type: string
+ *                 format: binary
+ *                 description: "Optional new image for the restaurant"
  *     responses:
- *       201:
- *         description: "{ success }"
+ *       200:
+ *         description: Restaurant updated
  *       400:
- *         description: "{ kind: error_code, content: invalid_field  }"
+ *         description: Invalid input
+ *       404:
+ *         description: Restaurant not found
  *       500:
- *         description: "{ kind: 'server_error', content: reason }"
+ *         description: Server error
  */
-restaurantRouter.put("/", updateRestaurant);
+
+restaurantRouter.put("/:id", upload.single("thumbnail"), updateRestaurant);
 
 /**
  * @swagger
- * /restaurants/:
+ * /restaurants/{id}:
  *   delete:
- *     tags: [Todo]
- *     summary: Manager can delete their restaurant
+ *     tags: [Restaurants]
+ *     summary: Manager can delete one of their restaurants
  *     security:
  *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               requestId:
- *                 type: number
- *                 format: number
- *                 example: 1
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: number
  *     responses:
- *       201:
- *         description: "{ success }"
- *       400:
- *         description: "{ kind: error_code, content: invalid_field  }"
+ *       200:
+ *         description: Restaurant deleted
+ *       404:
+ *         description: Restaurant not found
  *       500:
- *         description: "{ kind: 'server_error', content: reason }"
+ *         description: Server error
  */
-restaurantRouter.delete("/", deleteRestaurant);
+restaurantRouter.delete("/:id", deleteRestaurant);
 
 export { restaurantRouter };

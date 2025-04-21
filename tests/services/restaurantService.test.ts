@@ -44,7 +44,7 @@ describe("restaurantService (MySQL)", () => {
       );
 
       const result = await restaurantServiceCreate("Pasta", 2);
-      expect(result).toBeUndefined();
+      expect(result).toBeNull();
     });
   });
 
@@ -180,6 +180,59 @@ describe("restaurantService (MySQL)", () => {
 
       const result = await restaurantServiceGetById(999);
       expect(result).toBeNull();
+    });
+  });
+  describe("restaurantServiceUpdate", () => {
+    it("should update restaurant and return updated result", async () => {
+      queryMock
+        .mockResolvedValueOnce([{ affectedRows: 1 }]) // update query
+        .mockResolvedValueOnce([[{ id: 5, name: "Updated" }]]); // getById
+
+      const { restaurantServiceUpdate } = await import(
+        "@/services/restaurantService"
+      );
+
+      const result = await restaurantServiceUpdate(5, { name: "Updated" }, 1);
+      expect(result).toEqual({ id: 5, name: "Updated", photos: [] });
+      expect(queryMock).toHaveBeenCalledTimes(2);
+    });
+
+    it("should return null if update affects 0 rows", async () => {
+      queryMock.mockResolvedValueOnce([{ affectedRows: 0 }]);
+
+      const { restaurantServiceUpdate } = await import(
+        "@/services/restaurantService"
+      );
+
+      const result = await restaurantServiceUpdate(10, { name: "Nope" }, 2);
+      expect(result).toBeNull();
+    });
+
+    it("should return null if no update fields provided", async () => {
+      const { restaurantServiceUpdate } = await import(
+        "@/services/restaurantService"
+      );
+
+      const result = await restaurantServiceUpdate(1, {}, 1);
+      expect(result).toBeNull();
+    });
+
+    it("should return null on error", async () => {
+      queryMock.mockRejectedValueOnce(new Error("fail"));
+      const consoleSpy = jest.spyOn(console, "error").mockImplementation();
+
+      const { restaurantServiceUpdate } = await import(
+        "@/services/restaurantService"
+      );
+
+      const result = await restaurantServiceUpdate(1, { name: "Fail" }, 1);
+      expect(result).toBeNull();
+      expect(consoleSpy).toHaveBeenCalledWith(
+        "Error updating restaurant:",
+        expect.any(Error)
+      );
+
+      consoleSpy.mockRestore();
     });
   });
 });

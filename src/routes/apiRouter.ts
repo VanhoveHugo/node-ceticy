@@ -11,21 +11,22 @@ const router: Router = Router();
 /**
  * @swagger
  * tags:
- *   - name: Auth
+ *   name: Auth
+ *   description: Authentication API
  */
 router.use("/auth", authRouter);
 
 /**
  * @swagger
  * tags:
- *   - name: Friends
+ *   name: Friends
  */
 router.use("/friends", friendsRouter);
 
 /**
  * @swagger
  * tags:
- *   - name: Restaurants
+ *   name: Restaurants
  */
 router.use("/restaurants", restaurantRouter);
 
@@ -40,7 +41,8 @@ router.use("/polls", pollRouter);
 /**
  * @swagger
  * tags:
- *   - name: Todo
+ *   name: Todo
+ *   description: Feature to be implemented
  */
 router.get("/version", (req, res) => {
   res.json({ version: process.env.npm_package_version });

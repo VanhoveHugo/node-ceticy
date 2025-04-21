@@ -3,6 +3,20 @@ import swaggerJsDoc from "swagger-jsdoc";
 
 const isProd = process.env.NODE_ENV === "production";
 
+const servers: OpenAPIV3.ServerObject[] = isProd
+  ? [
+      {
+        url: "https://api.ceticy.fr",
+        description: "Production",
+      },
+    ]
+  : [
+      {
+        url: "http://localhost:3000",
+        description: "Development",
+      },
+    ];
+
 export const swaggerDocs = swaggerJsDoc({
   swaggerDefinition: {
     openapi: "3.0.0",
@@ -16,17 +30,7 @@ export const swaggerDocs = swaggerJsDoc({
         email: "contact@vanhovehugo.dev",
       },
     },
-    servers: [
-      isProd
-        ? {
-            url: "https://api.ceticy.fr",
-            description: "Production",
-          }
-        : {
-            url: "http://localhost:3000",
-            description: "Development",
-          },
-    ],
+    servers,
     components: {
       securitySchemes: {
         bearerAuth: {
