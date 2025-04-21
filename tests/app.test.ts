@@ -29,8 +29,15 @@ describe("app.ts", () => {
   });
 
   it("should log incoming requests", async () => {
-    await request(app).get("/test");
-    expect(infoMock).toHaveBeenCalledWith("Request: GET /test");
+    const now = new Date();
+    const formattedDate = now.toLocaleDateString("fr-FR");
+    const formattedTime = now.toLocaleTimeString("fr-FR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    const expectedLog = `Request: [${formattedDate} à ${formattedTime}] GET /`;
+    await request(app).get("/").expect(404);
+    expect(infoMock).toHaveBeenCalledWith(expectedLog);
   });
 
   it("should not use router when connection is undefined", () => {
