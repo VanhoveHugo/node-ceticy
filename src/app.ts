@@ -32,6 +32,9 @@ app.use(compression());
 // Limit the number of requests
 app.use(rateLimiter);
 
+// Set the trust proxy to true to enable rate limiting based on the client's IP address
+app.set("trust proxy", true);
+
 // Log each request
 app.use((req: Request, res: Response, next: NextFunction) => {
   const now = new Date();
@@ -43,6 +46,13 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   logs.info(
     `Request: [${formattedDate} à ${formattedTime}] ${req.method} ${req.originalUrl}`
   );
+
+  const ip = req.ip;
+
+  console.log(
+    `[${formattedDate} à ${formattedTime}] ${req.method} ${req.originalUrl} - IP: ${ip}`
+  );
+
   next();
 });
 

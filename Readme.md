@@ -26,7 +26,7 @@ docker compose up
 - [x] Poll Management
 
 ### B2B
-- [ ] Restaurant Management
+- [x] Restaurant Management
 - [ ] Manager Analytics
 
 
