@@ -34,7 +34,7 @@ services:
     environment:
       - NODE_ENV=production
     command: >
-      sh -c "npm install --production=false && npm run build && npm run start"
+      sh -c "npm install --production=false && npm run dev"
 
 
   traefik:

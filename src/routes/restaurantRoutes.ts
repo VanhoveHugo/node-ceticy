@@ -231,7 +231,6 @@ restaurantRouter.post("/", upload.single("thumbnail"), addRestaurant);
  *       500:
  *         description: Server error
  */
-
 restaurantRouter.put("/:id", upload.single("thumbnail"), updateRestaurant);
 
 /**
